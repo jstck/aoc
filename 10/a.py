@@ -21,7 +21,7 @@ scores = {
 
 score = 0
 
-n = 0
+n = 1
 
 for line in sys.stdin.readlines():
 
@@ -38,12 +38,7 @@ for line in sys.stdin.readlines():
             if not pairs[l] == c:
                 print(n, "Expected", pairs[l], "got",c)
                 score += scores[c]
-                stack = []
                 break
-        #Any characters are just ignored.
-
-    if len(stack)>0:
-        pass
-        #print(n, "incomplete line")
+        #Any other characters are just ignored.
 
 print("Total score", score)

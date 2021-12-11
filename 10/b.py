@@ -19,8 +19,7 @@ scores = {
     '>': 4
 }
 
-
-n = 0
+n = 1
 
 allscores = []
 
@@ -42,14 +41,14 @@ for line in sys.stdin.readlines():
                 break
         #Any other characters are just ignored.
 
-    #Completed / corrupted lines
+    #Skip completed / corrupted lines
     if len(stack)==0:
         continue
 
-    print(n, "incomplete line")
+    
     closer = [pairs[x] for x in reversed(stack)]
     score = 0
-    print("".join(closer))
+    print(n, "incomplete line, needs", "".join(closer))
     for c in closer:
         score = score * 5 + scores[c]
 
@@ -59,7 +58,7 @@ for line in sys.stdin.readlines():
 
 allscores.sort()
 
-mid = int((len(allscores)-1) / 2)
+mid = (len(allscores)-1) // 2
 
 print(allscores)
 print(mid, len(allscores))
