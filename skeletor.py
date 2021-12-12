@@ -4,7 +4,7 @@ import sys
 import argparse
 import re
 
-match = re.search(r'aoc(\d+)/(\d+)', __file__)
+match = re.search(r'aoc/?(\d+)/(\d+)', __file__)
 if match:
     descr = "Advent of Code " + match.group(1) + ":" + match.group(2)
 else:
