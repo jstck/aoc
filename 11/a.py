@@ -65,6 +65,8 @@ flashes = 0
 
 for step in range(100):
     flashes += cycle(grid)
+    print()
+    printgrid(grid)
 
 print()
 printgrid(grid)

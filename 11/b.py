@@ -63,13 +63,19 @@ def cycle(grid):
 
 xmax = len(grid[0])
 ymax = len(grid)
+
+printgrid(grid)
             
+finished = False
+
 for step in range(1,10000):
     flashes = cycle(grid)
 
     if flashes == xmax*ymax:
+        finished = True
         print("All flashed after",step,"steps")
         break
 
-print()
-printgrid(grid)
+if not finished:
+    print("Did not converge after", step+1, "steps")
+    printgrid(grid)
