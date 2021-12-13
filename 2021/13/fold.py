@@ -106,9 +106,9 @@ if part2:
         xmax = max(xmax, x)
         ymax = max(ymax, y)
 
-    grid = [ ["."] * (xmax+1) for y in range(ymax+1)]
+    grid = [ ["  "] * (xmax+1) for y in range(ymax+1)]
     for (x, y) in dots:
-        grid[y][x] = "#"
+        grid[y][x] = "##"
 
     for row in grid:
         print("".join(row))
