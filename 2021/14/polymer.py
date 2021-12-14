@@ -60,23 +60,6 @@ if part1:
 elif part2:
     length = 40
 
-
-def chunks(input, rules):
-    output = []
-    current = []
-    for i in range(0, len(input)-1):
-        pair = input[i] + input[i+1]
-        current.append(input[i])
-        if pair not in rules:
-            output.append(current)
-            current = []
-        else:
-            pass
-
-    current.append(input[-1])
-    output.append(current)
-    return output
-
 class myCounter:
     def __init__(self):
         self.counts = {}
@@ -94,7 +77,6 @@ if part1:
     for step in range(length):
         
         polymer = polymerize(polymer, rules)
-        print(chunks(polymer, rules))
         vprint(1, step, len(polymer))
         vprint(2, "".join(polymer))
 
@@ -123,7 +105,6 @@ if part2:
     vprint(2, pairs.counts)
 
     for step in range(length):
-
 
         newpairs = myCounter()
 
