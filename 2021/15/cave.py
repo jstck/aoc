@@ -34,17 +34,22 @@ if part2:
 
 grid = []
 
+def wrap(x):
+    return ((x-1)%9)+1
+
 for line in sys.stdin.readlines():
-    row = [int(x) for x in line.strip()]
-    grid.append(row*tiles) ##Repeat rows with tiling
+    tile = [int(x) for x in line.strip()]
+    row = []
+    for i in range(0,tiles):
+        row += [wrap(x+i) for x in tile]
+    grid.append(row)
 
-#Multiply rows
-if tiles > 1:
-    orig_size = len(grid)
-    for r in range(1,tiles):
-        for i in range(0,orig_size):
-            grid.append(grid[i])
 
+#Multiply rows as per tiling
+orig_size = len(grid)
+for i in range(1,tiles):
+    for r in range(0,orig_size):
+        grid.append([wrap(x+i) for x in grid[r]])
 
 xmax = len(grid[0])
 ymax = len(grid)
@@ -54,7 +59,6 @@ print("Grid size:", xmax, ymax)
 cost = [[-1]*(xmax) for y in range(ymax)] #-1 = infinite
 visited = set()
 
-#print(grid)
 q = queue.PriorityQueue()
 
 cost[0][0]=0
@@ -70,8 +74,7 @@ while not q.empty():
 
     if x==xmax-1 and y == ymax-1:
         print("Cost to end: ", c)
-        sys.exit(0)
-
+        break
 
     #print(x,y,c, len(nq))
     if not (x,y) in visited:
@@ -101,4 +104,7 @@ while not q.empty():
 
 #for line in cost:
 #    print(line)
-print(cost[ymax][xmax])
+
+
+
+print(cost[ymax-1][xmax-1])
