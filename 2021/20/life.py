@@ -1,30 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-
-def c2b(c):
-    if c=="#":
-        return 1
-    return 0
-
-def b2c(b):
-    if b==1:
-        return '#'
-    return '.'
-
-def b2c2(b):
-    if b==1:
-        return '[]'
-    return ' .'
-
-def getPixelIndex(image,x,y):
-    index = 0
-    for dy in [-1,0,1]:
-        for dx in [-1,0,1]:
-            index = index*2 + getPixelBounded(image,x+dx,y+dy)
-    return index
-
-
 rules = []
 for i in range(512):
 
@@ -36,6 +11,7 @@ for i in range(512):
     if l<9:
         b = '0'*(9-l) + b
 
+    #Make a nice list
     bits = [int(x) for x in list(b)]
 
     me = bits[4]
@@ -54,4 +30,3 @@ for i in range(512):
     rules.append(out)
 
 print("".join(rules))
-print(len(rules))
