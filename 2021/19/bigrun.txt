@@ -1,0 +1,161 @@
+#sensors: 40
+Beacon counts:
+25 26 25 26 25 26 25 25 25 26 26 26 26 25 26 26 26 26 26 26 26 25 26 26 25 26 25 26 26 26 27 25 25 26 26 25 25 26 25 26
+Merging 38 into 0 with offset (147, 155, -1150) rot 8 (12 hits)
+12 duplicates found
+Beacon counts:
+38 26 25 26 25 26 25 25 25 26 26 26 26 25 26 26 26 26 26 26 26 25 26 26 25 26 25 26 26 26 27 25 25 26 26 25 25 26 26
+Merging 15 into 0 with offset (-1111, -15, -1172) rot 18 (12 hits)
+12 duplicates found
+Beacon counts:
+52 26 25 26 25 26 25 25 25 26 26 26 26 25 26 26 26 26 26 26 25 26 26 25 26 25 26 26 26 27 25 25 26 26 25 25 26 26
+Merging 16 into 0 with offset (84, -12, -2408) rot 14 (12 hits)
+12 duplicates found
+Beacon counts:
+66 26 25 26 25 26 25 25 25 26 26 26 26 25 26 26 26 26 26 25 26 26 25 26 25 26 26 26 27 25 25 26 26 25 25 26 26
+Merging 4 into 0 with offset (152, 57, -3678) rot 21 (12 hits)
+12 duplicates found
+Beacon counts:
+79 26 25 26 26 25 25 25 26 26 26 26 25 26 26 26 26 26 25 26 26 25 26 25 26 26 26 27 25 25 26 26 25 25 26 26
+Merging 9 into 0 with offset (140, 1336, -2439) rot 9 (12 hits)
+12 duplicates found
+Beacon counts:
+93 26 25 26 26 25 25 25 26 26 26 25 26 26 26 26 26 25 26 26 25 26 25 26 26 26 27 25 25 26 26 25 25 26 26
+Merging 5 into 0 with offset (73, 2415, -2429) rot 5 (12 hits)
+12 duplicates found
+Beacon counts:
+106 26 25 26 26 25 25 26 26 26 25 26 26 26 26 26 25 26 26 25 26 25 26 26 26 27 25 25 26 26 25 25 26 26
+Merging 24 into 0 with offset (130, 2535, -3661) rot 13 (12 hits)
+12 duplicates found
+Beacon counts:
+120 26 25 26 26 25 25 26 26 26 25 26 26 26 26 26 25 26 26 25 26 25 26 26 27 25 25 26 26 25 25 26 26
+Merging 6 into 0 with offset (-1166, 2471, -3551) rot 4 (12 hits)
+12 duplicates found
+Beacon counts:
+133 26 25 26 26 25 26 26 26 25 26 26 26 26 26 25 26 26 25 26 25 26 26 27 25 25 26 26 25 25 26 26
+Merging 17 into 0 with offset (-7, 2465, -4812) rot 6 (12 hits)
+12 duplicates found
+Beacon counts:
+147 26 25 26 26 25 26 26 26 25 26 26 26 26 26 25 26 25 26 25 26 26 27 25 25 26 26 25 25 26 26
+Merging 3 into 0 with offset (-1230, 1218, -4909) rot 17 (12 hits)
+12 duplicates found
+Beacon counts:
+161 26 25 26 25 26 26 26 25 26 26 26 26 26 25 26 25 26 25 26 26 27 25 25 26 26 25 25 26 26
+Merging 20 into 0 with offset (61, 1318, -4788) rot 17 (21 hits)
+21 duplicates found
+Beacon counts:
+166 26 25 26 25 26 26 26 25 26 26 26 26 26 25 26 25 26 25 26 27 25 25 26 26 25 25 26 26
+Merging 14 into 0 with offset (1189, 1325, -4821) rot 7 (12 hits)
+12 duplicates found
+Beacon counts:
+179 26 25 26 25 26 26 26 25 26 26 26 26 26 26 25 26 25 26 27 25 25 26 26 25 25 26 26
+Merging 16 into 0 with offset (1176, 1237, -5981) rot 6 (12 hits)
+12 duplicates found
+Beacon counts:
+193 26 25 26 25 26 26 26 25 26 26 26 26 26 26 25 25 26 27 25 25 26 26 25 25 26 26
+Merging 18 into 0 with offset (1182, 2551, -6086) rot 8 (15 hits)
+15 duplicates found
+Beacon counts:
+205 26 25 26 25 26 26 26 25 26 26 26 26 26 26 25 25 26 25 25 26 26 25 25 26 26
+Merging 18 into 0 with offset (-1172, 1211, -2375) rot 0 (18 hits)
+18 duplicates found
+Beacon counts:
+212 26 25 26 25 26 26 26 25 26 26 26 26 26 26 25 25 26 25 26 26 25 25 26 26
+Merging 2 into 0 with offset (-2296, 1210, -2351) rot 11 (12 hits)
+12 duplicates found
+Beacon counts:
+225 26 26 25 26 26 26 25 26 26 26 26 26 26 25 25 26 25 26 26 25 25 26 26
+Merging 18 into 0 with offset (91, 1367, -3627) rot 1 (24 hits)
+24 duplicates found
+Beacon counts:
+227 26 26 25 26 26 26 25 26 26 26 26 26 26 25 25 26 25 26 25 25 26 26
+Merging 19 into 0 with offset (-1069, 1334, -1335) rot 21 (18 hits)
+18 duplicates found
+Beacon counts:
+234 26 26 25 26 26 26 25 26 26 26 26 26 26 25 25 26 25 26 25 26 26
+Merging 2 into 0 with offset (-1125, 2470, -1239) rot 13 (15 hits)
+15 duplicates found
+Beacon counts:
+245 26 25 26 26 26 25 26 26 26 26 26 26 25 25 26 25 26 25 26 26
+Merging 2 into 0 with offset (-1041, 3750, -2376) rot 1 (12 hits)
+12 duplicates found
+Beacon counts:
+258 26 26 26 26 25 26 26 26 26 26 26 25 25 26 25 26 25 26 26
+Merging 7 into 0 with offset (-1168, 4811, -2507) rot 19 (12 hits)
+12 duplicates found
+Beacon counts:
+272 26 26 26 26 25 26 26 26 26 26 25 25 26 25 26 25 26 26
+Merging 7 into 0 with offset (-2300, 2420, -1172) rot 8 (15 hits)
+15 duplicates found
+Beacon counts:
+283 26 26 26 26 25 26 26 26 26 25 25 26 25 26 25 26 26
+Merging 11 into 0 with offset (-1061, 3690, -1300) rot 15 (18 hits)
+18 duplicates found
+Beacon counts:
+290 26 26 26 26 25 26 26 26 26 25 26 25 26 25 26 26
+Merging 13 into 0 with offset (37, 3619, -1177) rot 1 (15 hits)
+15 duplicates found
+Beacon counts:
+301 26 26 26 26 25 26 26 26 26 25 26 25 25 26 26
+Merging 6 into 0 with offset (86, 4852, -1290) rot 22 (15 hits)
+15 duplicates found
+Beacon counts:
+312 26 26 26 26 25 26 26 26 25 26 25 25 26 26
+Merging 4 into 0 with offset (10, 4959, 1) rot 20 (12 hits)
+12 duplicates found
+Beacon counts:
+326 26 26 26 25 26 26 26 25 26 25 25 26 26
+Merging 5 into 0 with offset (51, 6081, -1202) rot 2 (12 hits)
+12 duplicates found
+Beacon counts:
+340 26 26 26 25 26 26 25 26 25 25 26 26
+Merging 7 into 0 with offset (139, 7342, -1144) rot 5 (12 hits)
+12 duplicates found
+Beacon counts:
+353 26 26 26 25 26 26 26 25 25 26 26
+Merging 7 into 0 with offset (-1201, 6159, -1249) rot 9 (15 hits)
+15 duplicates found
+Beacon counts:
+364 26 26 26 25 26 26 25 25 26 26
+Merging 7 into 0 with offset (4, 6024, -123) rot 11 (18 hits)
+18 duplicates found
+Beacon counts:
+371 26 26 26 25 26 26 25 26 26
+Merging 7 into 0 with offset (25, -1081, -3562) rot 1 (12 hits)
+12 duplicates found
+Beacon counts:
+384 26 26 26 25 26 26 26 26
+Merging 6 into 0 with offset (40, -2227, -3679) rot 12 (12 hits)
+12 duplicates found
+Beacon counts:
+398 26 26 26 25 26 26 26
+Merging 1 into 0 with offset (39, -3432, -3735) rot 3 (12 hits)
+12 duplicates found
+Beacon counts:
+412 26 26 25 26 26 26
+Merging 3 into 0 with offset (-1133, -2226, -3620) rot 15 (12 hits)
+12 duplicates found
+Beacon counts:
+425 26 26 26 26 26
+Merging 1 into 0 with offset (-2428, -2405, -3634) rot 23 (12 hits)
+12 duplicates found
+Beacon counts:
+439 26 26 26 26
+Merging 2 into 0 with offset (43, -2315, -2539) rot 16 (12 hits)
+12 duplicates found
+Beacon counts:
+453 26 26 26
+Merging 2 into 0 with offset (30, 2407, -5973) rot 16 (18 hits)
+18 duplicates found
+Beacon counts:
+461 26 26
+Merging 2 into 0 with offset (-1091, 4964, -52) rot 15 (18 hits)
+18 duplicates found
+Beacon counts:
+469 26
+Merging 1 into 0 with offset (-2393, 4828, -81) rot 10 (12 hits)
+12 duplicates found
+Beacon counts:
+483
+Total beacons:  483
+
