@@ -30,6 +30,21 @@ def vprint(*args):
         print(*args[1:])
 
 
+def chunks(input, ints=False):
+    chunk = []
+    chunky = []
+    for line in input:
+        if len(line) == 0:
+            chunky.append(chunk)
+            chunk = []
+        else:
+            if ints:
+                chunk.append(int(line))
+            else:
+                chunk.append(line)
+
+    chunky.append(chunk)
+    return chunky
 
 
 
@@ -65,13 +80,13 @@ if tests:
         if run1:
             output = part1(input)
             if output != case["output"]:
-                print(f"Test failed for input {case['input']}.\n\nGot:\n{output}\n\nExpected:\n{case['output']}\n")
+                print(f"Test part 1failed for input:\n====\n{case['input'].strip()}\n====\n.\n\nGot:\n{output}\n\nExpected:\n{case['output']}\n")
                 success = False
 
         if run2 and case["output2"] is not None:
             output = part2(input)
             if output != case["output2"]:
-                print(f"Test failed for input {case['input']}.\n\nGot:\n{output}\n\nExpected:\n{case['output2']}\n")
+                print(f"Test part 2 failed for input:\n====\n{case['input'].strip()}\n====\nGot:\n{output}\n\nExpected:\n{case['output2']}\n")
                 success = False
 
     if success:
@@ -89,6 +104,9 @@ else:
         print("PART 1")
         print("======")
         print(part1(input))
+
+    if run1 and run2:
+        print()
 
     if run2:
         print("PART 2")
