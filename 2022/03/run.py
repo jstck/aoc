@@ -91,12 +91,10 @@ def part1(input):
     return sum
 
 def part2(input):
-    lines = len(input)
-    groups = lines//3
     sum = 0
 
-    for n in range(groups):
-        l1, l2, l3 = input[n*3:n*3+3]
+    for n in range(0, len(input), 3):
+        l1, l2, l3 = input[n:n+3]
         #vprint(1,n,len(l1), len(l2),len(l3))
 
         s1 = set(list(l1))
@@ -104,8 +102,12 @@ def part2(input):
         s3 = set(list(l3))
 
         i = s1 & s2 & s3
-        c = list(i)[0][0]
 
+        if len(list(i)) != 1:
+            print("ERROR:", i, "line", n)
+            sys.exit(1)
+
+        c = list(i)[0]
 
         if c.islower():
             score = 1+ord(c)-ord('a')
