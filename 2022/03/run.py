@@ -74,8 +74,12 @@ def part1(input):
         s2 = set(list(r2))
 
         i = s1 & s2
+
+        assert(len(i)==1)
         
-        c = list(i)[0][0] #first char of first item in set
+        c = list(i)[0]
+
+        assert(len(c)==1)
 
         if c.islower():
             score = 1+ord(c)-ord('a')
@@ -95,19 +99,19 @@ def part2(input):
 
     for n in range(0, len(input), 3):
         l1, l2, l3 = input[n:n+3]
-        #vprint(1,n,len(l1), len(l2),len(l3))
-
+        
         s1 = set(list(l1))
         s2 = set(list(l2))
         s3 = set(list(l3))
 
         i = s1 & s2 & s3
 
-        if len(list(i)) != 1:
-            print("ERROR:", i, "line", n)
-            sys.exit(1)
+        vprint(1,i)
+        assert(len(list(i))==1)
 
         c = list(i)[0]
+
+        assert(len(c)==1)
 
         if c.islower():
             score = 1+ord(c)-ord('a')
