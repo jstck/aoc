@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description = descr)
 parser.add_argument('-1', action='store_true', help="Do part 1")
 parser.add_argument('-2', action='store_true', help="Do part 2")
 parser.add_argument('-t', action='store_true', help="Run tests")
+parser.add_argument('-f', '--input-file', default='input.txt')
 parser.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity")
 
 args = parser.parse_args()
@@ -23,6 +24,7 @@ tests = vars(args)["t"]
 run2 = vars(args)["2"]
 run1 = vars(args)["1"] or not run2 #Do part 1 if nothing else specified
 verbosity = vars(args)["verbose"]
+input_file = vars(args)["input_file"]
 
 #Print controlled by verbosity level
 def vprint(*args):
@@ -43,7 +45,8 @@ def chunks(input, ints=False):
             else:
                 chunk.append(line)
 
-    chunky.append(chunk)
+    if len(chunk)>0:
+        chunky.append(chunk)
     return chunky
 
 
@@ -61,11 +64,21 @@ move 2 from 2 to 1
 move 1 from 1 to 2""",
         "output": "CMZ",
         "output2": "MCD"
+    },
+    {
+        "input": """    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 1 from 2 to 1
+""",
+        "output": "CMZ",
+        "output2": "MCD"
     }
 ]
-
-
-
 
 def parse(input):
     parts = chunks(input)
@@ -103,6 +116,8 @@ def parse(input):
     seq = []
 
     for move in moves:
+        if len(move.strip())==0:
+            continue
         parts = move.split()
         n = int(parts[1])
         f = int(parts[3])-1
@@ -182,8 +197,9 @@ if tests:
 
 else:
     try:
-        fp = open("input.txt", "r")
+        fp = open(input_file, "r")
     except FileNotFoundError:
+        print("Input file not found, using stdin")
         fp = sys.stdin
     
     input = [x for x in fp.readlines()]
