@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description = descr)
 parser.add_argument('-1', action='store_true', help="Do part 1")
 parser.add_argument('-2', action='store_true', help="Do part 2")
 parser.add_argument('-t', action='store_true', help="Run tests")
+parser.add_argument('-f', '--input-file', default='input.txt')
 parser.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity")
 
 args = parser.parse_args()
@@ -23,12 +24,13 @@ tests = vars(args)["t"]
 run2 = vars(args)["2"]
 run1 = vars(args)["1"] or not run2 #Do part 1 if nothing else specified
 verbosity = vars(args)["verbose"]
+input_file = vars(args)["input_file"]
+
 
 #Print controlled by verbosity level
 def vprint(*args):
     if args[0]<= verbosity:
         print(*args[1:])
-
 
 def chunks(input, ints=False):
     chunk = []
@@ -43,7 +45,8 @@ def chunks(input, ints=False):
             else:
                 chunk.append(line)
 
-    chunky.append(chunk)
+    if len(chunk)>0:
+        chunky.append(chunk)
     return chunky
 
 
@@ -69,11 +72,10 @@ def part2(input):
 
 if tests:
 
+    success = True
 
     def splitLines(input):
         return [x.strip() for x in input.split("\n")]
-
-    success = True
 
     for case in test_cases:
         input = splitLines(case["input"])
@@ -83,7 +85,7 @@ if tests:
                 print(f"Test part 1failed for input:\n====\n{case['input'].strip()}\n====\n.\n\nGot:\n{output}\n\nExpected:\n{case['output']}\n")
                 success = False
 
-        if run2 and case["output2"] is not None:
+        if run2 and "output2" in case and case["output2"] is not None:
             output = part2(input)
             if output != case["output2"]:
                 print(f"Test part 2 failed for input:\n====\n{case['input'].strip()}\n====\nGot:\n{output}\n\nExpected:\n{case['output2']}\n")
@@ -94,8 +96,9 @@ if tests:
 
 else:
     try:
-        fp = open("input.txt", "r")
+        fp = open(input_file, "r")
     except FileNotFoundError:
+        print("Input file not found, using stdin")
         fp = sys.stdin
     
     input = [x.strip() for x in fp.readlines()]
