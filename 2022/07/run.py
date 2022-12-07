@@ -75,7 +75,8 @@ $ ls
 4060174 j
 8033020 d.log
 5626152 d.ext
-7214296 k""",
+7214296 k
+""",
         "output": 95437,
         "output2": 24933642
     }
@@ -139,6 +140,7 @@ def parse(input):
     tree = {}
 
     for line in input:
+        if len(line) == 0: continue
         if line[0] == "$":
             cmd = line.split(" ")
             vprint(2, cmd)
