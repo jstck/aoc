@@ -96,27 +96,31 @@ YMIN, YMAX = (-99, 172)
 
 from PIL import Image
 
-TAIL_COLOR = (0, 255, 0)
-ROPE_COLOR = (255, 0, 255)
-ROPE_VISITED_COLOR = (120,120,80)
-HEAD_COLOR = (255, 255, 255)
-HEAD_VISITED_COLOR = (200, 0, 0)
-
-def drawFrame(tail, rope, rope_visited, head_visited):
+COLORS = [
+    (255, 0, 0),
+    (255, 127, 0),
+    (255, 255, 0),
+    (127, 255, 0),
+    (0, 255, 0),
+    (0, 255, 127),
+    (0, 255, 255),
+    (0, 127, 255),
+    (0, 0, 255),
+    (127, 0, 255),
+    (255, 0, 255),
+    (255, 0, 127),
+]
+def drawFrame(visiteds, count):
     frame = Image.new("RGB", (XMAX-XMIN+1, YMAX-YMIN+1), (0, 0, 0))
     pixels = frame.load()
-    for (x, y) in rope_visited:
-        pixels[x-XMIN, y-YMIN] = ROPE_VISITED_COLOR
-    for (x, y) in head_visited:
-        pixels[x-XMIN, y-YMIN] = HEAD_VISITED_COLOR
-    for (x, y) in tail:
-        pixels[x-XMIN, y-YMIN] = TAIL_COLOR
     
-    for (x, y) in rope:
-        pixels[x-XMIN, y-YMIN] = ROPE_COLOR
-    head = rope[0]
-    pixels[head[0]-XMIN, head[1]-YMIN] = HEAD_COLOR
-
+    for i in range(len(visiteds)-1, -1, -1):
+        colorindex = (i+count) % len(COLORS)
+        color = COLORS[colorindex]
+        scale = 1.0-0.05*i
+        color = tuple((int(scale*x) for x in color))
+        for (x, y) in visiteds[i]:
+            pixels[x-XMIN, y-YMIN] = color
     return frame
     
 
@@ -129,8 +133,7 @@ def moveRope(input, length):
 
     rope = [[0, 0]] * length
     visited = set([(0,0)])
-    rope_visited = set([(0,0)])
-    head_visited = set([(0,0)])
+    visiteds = [set([(0,0)]) for _ in range(length)]
 
     #frames.append(drawFrame(visited, rope, rope_visited, head_visited))
 
@@ -145,23 +148,23 @@ def moveRope(input, length):
             tail = rope[-1]
             visited.add(tail)
 
-            rope_visited.update(rope)
-            head_visited.add(rope[0])
+            for i in range(length):
+                pos = rope[i]
+                visiteds[i].add(pos)
 
-            count += 1
-            if count%100 == 0: print("Drawing frame", count)
+        count += 1
+        if count%100 == 0: print("Drawing frame", count)
 
-            frame = drawFrame(visited, rope, rope_visited, head_visited)
-            frames.append(frame)
-                        
-    #lastframe = drawFrame(visited, rope, rope_visited, head_visited)
-    lastframe = frames[-1]
+        frame = drawFrame(visiteds, count)
+        frames.append(frame)
             
+    lastframe = frames[-1]
+    #lastframe = drawFrame(visiteds)        
     #printGrid(visited, rope)
     print("Saving image")
-    frames[0].save("animate.gif", format="GIF", append_images=frames, save_all=True, duration=1, loop=0)
+    frames[0].save("skittles.gif", format="GIF", append_images=frames, save_all=True, duration=1, loop=0)
 
-    lastframe.save("lastframe.gif", format="GIF")
+    lastframe.save("rainbow.gif", format="GIF")
     
     return len(visited)
 
