@@ -67,19 +67,34 @@ def part2(input):
 
 
 
+def fixInput(raw):
+    lines = [x.strip() for x in raw.split("\n")]
 
-
+    #Remove trailing blank lines
+    while len(lines[-1]):
+        lines.pop()
 
 if tests:
 
     success = True
 
     def splitLines(input):
-        return [x.strip() for x in input.split("\n")]
+        return 
 
     for case in test_cases:
-        input = splitLines(case["input"])
-        if run1:
+        rawinput = case["input"]
+
+        match = re.search(r'^FILE:([\S]+)$', input.strip())
+        if match:
+            filename = match.group(1)
+            print("Loading", filename)
+            with open(filename, "r") as fp:
+                rawinput = fp.read()
+
+        input = fixInput(rawinput)
+        
+
+        if run1 and "output" in case and case["output"] is not None:
             output = part1(input)
             if output != case["output"]:
                 print(f"Test part 1failed for input:\n====\n{case['input'].strip()}\n====\n.\n\nGot:\n{output}\n\nExpected:\n{case['output']}\n")
@@ -101,7 +116,7 @@ else:
         print("Input file not found, using stdin")
         fp = sys.stdin
     
-    input = [x.strip() for x in fp.readlines()]
+    input = fixInput(fp.read())
 
     if run1:
         print("PART 1")
