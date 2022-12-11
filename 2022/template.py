@@ -84,7 +84,7 @@ if tests:
     for case in test_cases:
         rawinput = case["input"]
 
-        match = re.search(r'^FILE:([\S]+)$', input.strip())
+        match = re.search(r'^FILE:([\S]+)$', rawinput.strip())
         if match:
             filename = match.group(1)
             print("Loading", filename)
@@ -119,9 +119,18 @@ else:
     input = fixInput(fp.read())
 
     if run1:
+        print("Running part 1")
+        result1 = part1(input)
+    if run2:
+        print("Running part 2")
+        result2 = part2(input)
+
+    print()
+
+    if run1:
         print("PART 1")
         print("======")
-        print(part1(input))
+        print(result1)
 
     if run1 and run2:
         print()
@@ -129,4 +138,4 @@ else:
     if run2:
         print("PART 2")
         print("======")
-        print(part2(input))
+        print(result2)
