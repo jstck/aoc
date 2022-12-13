@@ -73,6 +73,7 @@ def fixInput(raw):
     #Remove trailing blank lines
     while len(lines[-1]):
         lines.pop()
+    return lines
 
 if tests:
 
