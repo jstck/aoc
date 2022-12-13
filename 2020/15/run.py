@@ -104,7 +104,7 @@ def memorygame(input, turns=2020):
 
     while turn < turns:
         turn += 1
-        if turn%1000000==0: print(turn)
+
         if len(memory[last])==1:
             speak = 0
         else:
@@ -116,6 +116,8 @@ def memorygame(input, turns=2020):
             memory[speak] = [turn]
 
         last = speak
+
+        #if turn%1000000==0: print(f"{turn:8d}: {speak}")
 
     return last
 
