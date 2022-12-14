@@ -71,7 +71,7 @@ def fixInput(raw):
     lines = [x.strip() for x in raw.split("\n")]
 
     #Remove trailing blank lines
-    while len(lines[-1]):
+    while len(lines[-1])==0:
         lines.pop()
     return lines
 

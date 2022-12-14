@@ -13,7 +13,6 @@ class Grid:
             self._grid.append(row)
 
     def __getitem__(self, arg):
-        print(arg)
         if isinstance(arg, int):
             #Get a row
             return self._grid[arg]
