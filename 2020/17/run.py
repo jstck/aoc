@@ -55,18 +55,20 @@ test_cases = [
     {
         "input": "FILE:sample.txt",
         "output": 112,
-        "output2": None
+        "output2": 848
     }
 ]
 
-def initial_set(input):
+def initial_set(input, d4=False):
     space = set()
     z=0
+    w=0
     for (y, row) in enumerate(input):
         print(y,row)
         for (x, cell) in enumerate(row):
             if cell=="#":
-                space.add((x,y,z))
+                if not d4: space.add((x,y,z))
+                else: space.add((x,y,z,w))
 
     return space
 
@@ -76,12 +78,29 @@ def findBounds(space):
     for (x, y, z) in space:
         if xmin is None or x < xmin: xmin = x
         if xmax is None or x > xmax: xmax = x
-        if ymin is None or y < xmin: ymin = y
-        if ymax is None or y > xmax: ymax = y
-        if zmin is None or z < xmin: zmin = z
-        if zmax is None or z > xmax: zmax = z
+        if ymin is None or y < ymin: ymin = y
+        if ymax is None or y > ymax: ymax = y
+        if zmin is None or z < zmin: zmin = z
+        if zmax is None or z > zmax: zmax = z
 
     return ( (xmin, xmax), (ymin, ymax), (zmin, zmax) )
+
+
+def findBounds4D(space):
+    xmin, xmax, ymin, ymax, zmin, zmax, wmin, wmax = None, None, None, None, None, None, None, None
+
+    for (x, y, z, w) in space:
+        if xmin is None or x < xmin: xmin = x
+        if xmax is None or x > xmax: xmax = x
+        if ymin is None or y < ymin: ymin = y
+        if ymax is None or y > ymax: ymax = y
+        if zmin is None or z < zmin: zmin = z
+        if zmax is None or z > zmax: zmax = z
+        if wmin is None or w < wmin: wmin = w
+        if wmax is None or w > wmax: wmax = w
+
+    return ( (xmin, xmax), (ymin, ymax), (zmin, zmax) , (wmin, wmax))
+
 
 def neighbours(t):
     (x,y,z) = t
@@ -91,6 +110,17 @@ def neighbours(t):
             for dz in [-1,0,1]:
                 if dx==0 and dy==0 and dz==0: continue
                 yield (x+dx,y+dy,z+dz)
+
+
+def neighbours4D(t):
+    (x,y,z,w) = t
+
+    for dx in [-1,0,1]:
+        for dy in [-1,0,1]:
+            for dz in [-1,0,1]:
+                for dw in [-1,0,1]:
+                    if dx==0 and dy==0 and dz==0 and dw==0: continue
+                    yield (x+dx,y+dy,z+dz,w+dw)
 
 
 def printslice(space, z=0):
@@ -111,8 +141,8 @@ def printslice(space, z=0):
 def part1(input):
     space = initial_set(input)
 
-    for round in range(1,6+1):
-        print("ROUND", round)
+    for round in range(1,7):
+        vprint(1,"ROUND", round)
         (xbounds, ybounds, zbounds) = findBounds(space)
         
         newspace = set()
@@ -125,13 +155,39 @@ def part1(input):
                     n = len([p for p in neighbours((x,y,z)) if p in space])
                     if n==3 or (n==2 and me): newspace.add(t)
 
-        printslice(newspace, 0)
-        print(len(newspace))
+        if verbosity>=1:
+            (_, _, zbounds) = findBounds(newspace)
+            for z in range(zbounds[0], zbounds[1]+1):
+                print("Z=",z)
+                printslice(newspace, z)
+                print()
+            print(len(newspace))
+            print()
         space = newspace
+
+    return len(space)
 
 
 def part2(input):
-    pass
+    space = initial_set(input, True)
+
+    for round in range(1,7):
+        (xbounds, ybounds, zbounds, wbounds) = findBounds4D(space)
+        
+        newspace = set()
+
+        for x in range(xbounds[0]-1, xbounds[1]+2):
+            for y in range(ybounds[0]-1, ybounds[1]+2):
+                for z in range(zbounds[0]-1, zbounds[1]+2):
+                    for w in range(wbounds[0]-1, wbounds[1]+2):
+                        t = (x,y,z,w)
+                        me = (x,y,z,w) in space
+                        n = len([p for p in neighbours4D((x,y,z,w)) if p in space])
+                        if n==3 or (n==2 and me): newspace.add(t)
+
+        space = newspace
+
+    return len(space)
 
 
 
