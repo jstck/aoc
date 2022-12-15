@@ -3,6 +3,13 @@
 import sys
 import argparse
 import re
+import functools
+import itertools
+import collections
+from queue import PriorityQueue
+import heapq
+from dataclasses import dataclass
+import math
 
 match = re.search(r'aoc/?(\d+)/(\d+)', __file__)
 if match:
