@@ -28,11 +28,11 @@ input_file = vars(args)["input_file"]
 
 
 #Print controlled by verbosity level
-def vprint(*args):
+def vprint(*args) -> None:
     if args[0]<= verbosity:
         print(*args[1:])
 
-def chunks(input, ints=False):
+def chunks(input: list[str], ints: bool=False) -> list[list[str]]:
     chunk = []
     chunky = []
     for line in input:
@@ -59,15 +59,15 @@ test_cases = [
     }
 ]
 
-def part1(input):
+def part1(input: list[str]):
     return ""
 
-def part2(input):
+def part2(input: list[str]):
     pass
 
 
 
-def fixInput(raw):
+def fixInput(raw: str) -> list[str]:
     lines = [x.strip() for x in raw.split("\n")]
 
     #Remove trailing blank lines
@@ -78,9 +78,6 @@ def fixInput(raw):
 if tests:
 
     success = True
-
-    def splitLines(input):
-        return 
 
     for case in test_cases:
         rawinput = case["input"]
