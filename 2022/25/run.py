@@ -83,29 +83,23 @@ test_cases = [
 def fromSNAFU(snafu: str) -> int:
     total = 0
     for (i, digit) in enumerate(reversed(snafu)):
-        if digit == "-":
-            digit = -1
-        elif digit == "=":
-            digit = -2
-        else:
-            digit = int(digit)
-
-        total += (5**i)*digit
+        val = "=-012".index(digit) - 2
+        total += (5**i)*val
 
     return total
 
 
 def toSNAFU(x: int) -> str:
+    #Probably only works for positive x values
     result = []
 
-    while x != 0:
+    while x:
         r = x % 5
         digit = ["0", "1", "2", "=", "-"][r]
         result.append(digit)
 
         diff = [0, 1, 2, -2, -1][r]
-        x = x - diff
-        x = x // 5
+        x = (x-diff) // 5
 
     return "".join(reversed(result))
 
