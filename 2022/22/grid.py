@@ -65,3 +65,23 @@ class Grid:
         for r in self.cols():
             t._grid.append(r)
         return t
+
+    class _all_iter:
+        def __init__(self, grid):
+            self.x = 0
+            self.y = 0
+            self.grid = grid
+
+        def __next__(self):
+            if self.x >= self.grid.sizeX:
+                self.x = 0
+                self.y += 1
+            if self.y >= self.grid.sizeY:
+                raise StopIteration
+            
+            r = (self.x, self.y, self.grid[self.x, self.y])
+            self.x += 1
+            return r
+
+    def __iter__(self):
+        return Grid._all_iter(self)

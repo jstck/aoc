@@ -61,23 +61,9 @@ def chunks(input: list[str], ints: bool=False) -> list[list[str]]:
 
 test_cases = [
     {
-        "input": """
-        ...#
-        .#..
-        #...
-        ....
-...#.......#
-........#...
-..#....#....
-..........#.
-        ...#....
-        .....#..
-        .#......
-        ......#.
-
-10R5L5R10L4R5L5""",
+        "input": "FILE:sample.txt",
         "output": 6032,
-        "output2": None
+        "output2": 5031
     }
 ]
 
@@ -112,6 +98,23 @@ class Position:
     def __sub__(self, other):
         return Position(x=self.x-other.x, y=self.y-other.y)
 
+warp_truth = {
+    (1, "^"): (6, ">"),
+    (1, "<"): (4, ">"),
+    (2, "^"): (6, "^"),
+    (2, ">"): (5, "<"),
+    (2, "v"): (3, "<"),
+    (3, "<"): (4, "v"),
+    (3, ">"): (2, "^"),
+    (4, "^"): (3, ">"),
+    (4, "<"): (1, ">"),
+    (5, ">"): (2, "<"),
+    (5, "v"): (6, "<"),
+    (6, "<"): (1, "v"),
+    (6, ">"): (5, "^"),
+    (6, "v"): (2, "v"),
+}
+
 
 def turn(heading, spin):
     l = {
@@ -141,8 +144,231 @@ dmove = {
     "^": Position(0, -1),
 }
 
+def quadrant(pos: Position, map: Grid) -> int:
+    if tests:
+        x = (4*pos.x) // map.sizeX
+        y = 3*pos.y // map.sizeY
 
-def walk(pos: Position, heading, map: Grid):
+        if x==2 and y==0: return 1
+        if x==0 and y==1: return 2
+        if x==1 and y==1: return 3
+        if x==2 and y==1: return 4
+        if x==2 and y==2: return 5
+        if x==3 and y==2: return 6
+
+        return 0
+
+    else:
+        x = (3*pos.x) // map.sizeX
+        y = 4*pos.y // map.sizeY
+        if x==1 and y==0: return 1
+        if x==2 and y==0: return 2
+        if x==1 and y==1: return 3
+        if x==0 and y==2: return 4
+        if x==1 and y==2: return 5
+        if x==0 and y==3: return 6
+
+        return 0
+
+def mapstate(x: int, y: int, d: str) -> tuple[Position, str]:
+    return (Position(x,y), d)
+
+def warp(pos: Position, heading, map: Grid) -> tuple[Position, str]:
+    qfrom = quadrant(pos, map)
+
+    #Size of one square
+    if tests:
+        square_x = map.sizeX // 4
+        square_y = map.sizeY // 3
+    else:
+        square_x = map.sizeX // 3
+        square_y = map.sizeY // 4
+
+    assert square_x == square_y
+
+    square = square_x
+
+    #X and Y coords within it's square
+    px = pos.x % square
+    py = pos.y % square
+
+    if tests:
+
+        if qfrom == 1 and heading == "^":
+            #Map to Q2 North, reversed
+            y = square
+            x = square - 1 - px # square_x - (pos.x - 2*square_x)
+            return mapstate(x,y,"v")
+
+        if qfrom == 1 and heading == "<":
+            #Map to Q3 north
+            y = square
+            x = square + py
+            return mapstate(x,y,"v")
+        if qfrom == 1 and heading == ">":
+            #Map to Q6 east, reversed
+            x = 4*square-1
+            y = 3*square - 1 - py
+            return mapstate(x,y,"<")
+
+        if qfrom == 2 and heading == "^":
+            #map to 1 N reversed
+            x = 0
+            y = 3*square - 1 - px
+            return mapstate(x,y,"v")
+
+        if qfrom == 2 and heading == "<":
+            #Map to 6 S reversed
+            y = 3*square-1
+            x = 4*square - 1 - py
+            return mapstate(x,y,"^")
+
+        if qfrom == 2 and heading == "v":
+            #Map to 5S, reversed
+            y = 3*square-1
+            x = 3*square - 1 - px
+            return mapstate(x,y,"^")
+
+        if qfrom == 3 and heading == "^":
+            #Map to 1 W
+            x = 2*square
+            y = px
+            return mapstate(x,y,">")
+
+        if qfrom == 3 and heading == "v":
+            #Map to 5W reversed
+            x = 2*square
+            y = 3*square - 1 - px
+            return mapstate(x,y,">")
+
+        if qfrom == 4 and heading == ">":
+            #6N reversed
+            y = 2*square
+            x = 4*square - 1 - py
+            return mapstate(x,y,"v")
+
+        if qfrom == 5 and heading == "<":
+            #3S reversed
+            y = 2*square - 1
+            x = 2*square - 1 - py
+            return mapstate(x,y,"^")
+
+        if qfrom == 5 and heading == "v":
+            #2S reversed
+            y = 2*square - 1
+            x = square - 1 - px
+            return mapstate(x,y,"^")
+        
+        if qfrom == 6 and heading == "^":
+            #4E reversed
+            x = 3*square - 1
+            y = 2*square - 1 - px
+            return mapstate(x,y,"<")
+        
+        if qfrom == 6 and heading == ">":
+            #1E reversed
+            x = 3*square - 1
+            y = square - 1 - py
+            return mapstate(x,y,"<")
+        
+        if qfrom == 6 and heading == "v":
+            #2W reversed
+            x = 0
+            y = 2*square - 1 - px
+            return mapstate(x,y,">")
+    else:
+        #REAL CUBE
+        
+        if qfrom == 1 and heading == "^":
+            #Map to 6W
+            x = 0
+            y = 3*square + px
+            return mapstate(x,y,">")
+
+        if qfrom == 1 and heading == "<":
+            #Map to 4W reversed
+            x = 0
+            y = 3*square -1 - py
+            return mapstate(x,y,">")
+
+        if qfrom == 2 and heading == "^":
+            #Map to 6S
+            y = 4*square - 1
+            x = px
+            return mapstate(x,y,"^")
+
+        if qfrom == 2 and heading == ">":
+            #Map to 5E reversed
+            x = 2 * square - 1
+            y = 3*square - 1 - py
+            return mapstate(x,y,"<")
+
+        if qfrom == 2 and heading == "v":
+            #Map to 3E
+            x = 2 * square - 1
+            y = square + px
+            return mapstate(x,y,"<")
+
+        if qfrom == 3 and heading == "<":
+            #Map to 4N
+            y = 2*square
+            x = py
+            return mapstate(x,y,"v")
+
+        if qfrom == 3 and heading == ">":
+            #Map to 2S
+            y = square-1
+            x = 2*square + py
+            return mapstate(x,y,"^")
+
+        if qfrom == 4 and heading == "^":
+            #Map to 3W
+            x = square
+            y = square + px
+            return mapstate(x,y,">")
+
+        if qfrom == 4 and heading == "<":
+            #Map to 1W R
+            x = square
+            y = square - 1 - py
+            return mapstate(x,y,">")
+
+        if qfrom == 5 and heading == ">":
+            #Map to 2E R
+            x = 3 * square - 1
+            y = square - 1 - py
+            return mapstate(x,y,"<")
+
+        if qfrom == 5 and heading == "v":
+            #Map to 6E
+            x = square - 1
+            y = 3 * square + px
+            return mapstate(x,y,"<")
+
+        if qfrom == 6 and heading == "<":
+            #Map to 1N
+            y = 0
+            x = square + py
+            return mapstate(x,y,"v")
+
+        if qfrom == 6 and heading == ">":
+            #Map to 5S
+            y = 3*square - 1
+            x = square + py
+            return mapstate(x,y,"^")
+
+        if qfrom == 6 and heading == "v":
+            #Map to 2N
+            y = 0
+            x = 2*square + px
+            return mapstate(x,y,"v")
+        
+
+    print(f"I don't where I'm going from quadrant {qfrom} going {heading}, from {pos}")
+    assert False
+    #return (pos, heading)
+
+def walk(pos: Position, heading, map: Grid, part2=False):
     #See if we can go straight ahead
     newpos = pos + dmove[heading]
 
@@ -152,13 +378,37 @@ def walk(pos: Position, heading, map: Grid):
         dest = " " #Warp sign
 
     if dest == " ": #Warp
+        if part2:
+            (newpos, newheading) = warp(pos, heading, map)
+            qfrom = quadrant(pos, map)
+            qto = quadrant(newpos, map)
+            print(f"Warp from {pos} Q{qfrom} {heading} to {pos} Q{qto} {newheading}")
+            warptarget = map[newpos.x, newpos.y]
+
+            #Validate_warp
+            warp_dest = warp_truth[(qfrom, heading)]
+            if not warp_dest == (qto, newheading):
+                print(f"INVALID WARP from {qfrom} {heading}. Should be {warp_dest}, is {(qto, newheading)}")
+                assert False
+
+            if warptarget == "#":
+                return None
+            elif warptarget in ".<>^v":
+                map[newpos.x,newpos.y] = newheading
+                return mapstate(newpos.x,newpos.y,newheading)
+            else:
+                print(f"INVALID WARP TARGET {warptarget} at {newpos} Q{qto} (from {pos} Q{qfrom} {heading}")
+                map[newpos.x,newpos.y] = "X"
+                print(map)
+                assert False
+
         if heading == ">":
             for (x, c) in enumerate(map.row(pos.y)):
                 if c == " ": continue
                 if c == "#": return None #Blocked!
                 
                 map[x, newpos.y] = heading
-                return Position(x, newpos.y)
+                return mapstate(x, newpos.y, heading)
 
         if heading == "<":
             for (x, c) in reversed(list(enumerate(map.row(pos.y)))):
@@ -166,7 +416,7 @@ def walk(pos: Position, heading, map: Grid):
                 if c == "#": return None #Blocked!
                 
                 map[x, newpos.y] = heading
-                return Position(x, newpos.y)
+                return mapstate(x, newpos.y, heading)
 
         if heading == "v":
             for (y, c) in enumerate(map.col(pos.x)):
@@ -174,7 +424,7 @@ def walk(pos: Position, heading, map: Grid):
                 if c == "#": return None #Blocked!
                 
                 map[newpos.x, y] = heading
-                return Position(newpos.x, y)
+                return mapstate(newpos.x, y, heading)
 
         if heading == "^":
             for (y, c) in reversed(list(enumerate(map.col(pos.x)))):
@@ -182,18 +432,17 @@ def walk(pos: Position, heading, map: Grid):
                 if c == "#": return None #Blocked!
 
                 map[newpos.x, y] = heading
-                return Position(newpos.x, y)
+                return mapstate(newpos.x, y, heading)
 
     if dest == "#":
         #Can't go there
         return None
 
     map[newpos.x, newpos.y] = heading
-    return newpos
+    return mapstate(newpos.x, newpos.y, heading)
     
 
-def move(pos: Position, dir: str, map: Grid, op) -> tuple[Position, str]:
-    print(op)
+def move(pos: Position, dir: str, map: Grid, op, part2=False) -> tuple[Position, str]:
     if isinstance(op, str):
         newdir = turn(dir, op)
         map[pos.x, pos.y] = newdir
@@ -201,11 +450,11 @@ def move(pos: Position, dir: str, map: Grid, op) -> tuple[Position, str]:
 
     else:
         for _ in range(op):
-            newpos = walk(pos, dir, map)
-            if newpos is None:
+            newstate = walk(pos, dir, map, part2)
+            if newstate is None:
                 return (pos, dir)
             else:
-                pos = newpos
+                (pos, dir) = newstate
         return (pos, dir)
 
 
@@ -237,13 +486,30 @@ def part1(input: list[str]):
         (pos, dir) = move(pos, dir, map, op)
 
     print(pos)
-    print(map)
+    #print(map)
 
     return score(pos, dir)
 
 
 def part2(input: list[str]):
-    pass
+    route, map = parse(input)
+
+    start_Y = 0
+    start_X = map.row(start_Y).index(".")
+
+    dir = ">"
+
+    map[start_X,start_Y] = dir
+
+    pos = Position(start_X, start_Y)
+
+    for op in route:
+        (pos, dir) = move(pos, dir, map, op, part2=True)
+
+    print(pos)
+    #print(map)
+
+    return score(pos, dir)
 
 
 
