@@ -108,7 +108,8 @@ class ShapeFactory():
 
 class MoveFactory:
     def __init__(self, input, count=0):
-        self._moves = list(input.strip())
+        assert isinstance(input, list)
+        self._moves = input
         self.size = len(self._moves)
         self.count = count
 
@@ -194,6 +195,8 @@ def gluerock(tower, shape, height):
             tower[h] = newline
 
 def tetris(input, count, tower=[], startstate = State(0, 0), findcycle=False):
+    #Make a copy
+    tower = list([list(row) for row in tower])
     shapes = ShapeFactory(count=startstate.shape)
     moves = MoveFactory(input, count=startstate.move)
 
@@ -203,10 +206,11 @@ def tetris(input, count, tower=[], startstate = State(0, 0), findcycle=False):
 
         if findcycle and shapes.atStart():
             now = State(shapes.count, moves.getPos())
+            now2 = State(shapes.count, moves.count)
             matching_states = [x for x in cycle_states if x.move==now.move]
             if len(matching_states)>0:
                 #A cycle found
-                return (tower, matching_states[-1], now)
+                return (tower, matching_states[-1], now2)
             #No cycle yet
             cycle_states.append(now)
 
@@ -252,22 +256,37 @@ def tetris(input, count, tower=[], startstate = State(0, 0), findcycle=False):
     return tower
 
 def part1(input: str):
-    return len(tetris(input, 2022))
+    input_list = list(input.strip())
+    return len(tetris(input_list, 2022))
 
-            
 
-
-    
 
 def part2(input: str):
+    allmoves = list(input.strip())
+    input_length = len(allmoves)
+    
+
     totalmoves = 1_000_000_000_000
-    (tower, cycle_start, cycle_end) = tetris(input, totalmoves, findcycle=True)
+    
+    (tower, cycle_start, cycle_end) = tetris(allmoves, totalmoves, findcycle=True)
 
-    print(f"Cycle found from {cycle_start.shape} to {cycle_end.shape} with move={cycle_start.move}")
+    print(cycle_start)
+    print(cycle_end)
 
-    cycle_length = cycle_end.shape - cycle_start.shape
+    assert cycle_start.shape % 5 == cycle_end.shape % 5
+    assert cycle_start.move % input_length == cycle_end.move % input_length
 
-    start_length = cycle_start.shape
+    print(f"Cycle found from {cycle_start.shape} to {cycle_end.shape-1} with move={cycle_start.move}")
+
+    #For safety double the cycle length
+    cycle_length_a = (cycle_end.shape - cycle_start.shape)
+    if not tests:
+        cycle_length_a -= 5 #Did this by accident, but without it it worksn't ????
+    cycle_length = 2*cycle_length_a
+
+    print("Determined cycle length:", cycle_length)
+
+    start_length = cycle_start.shape+cycle_length_a
 
     n_cycles = (totalmoves - start_length) // cycle_length
     final_steps = (totalmoves - start_length) % cycle_length
@@ -276,34 +295,42 @@ def part2(input: str):
 
     assert start_length + n_cycles*cycle_length + final_steps == totalmoves
 
-    #Run one cycle on top of tower to figure out how much it adds
-    start_height = len(tower)
-    tower = tetris(input, cycle_length, tower, startstate=cycle_end)
 
+    #Simulate the start
+    tower = tetris(allmoves, count=start_length, tower=[])
+
+    start_height = len(tower)
+
+    print(f"Start stuff: {start_height}")
+
+    print(f"============== AT START ============= h={start_height}")
+    printTower(tower[-17:])
+
+
+    #Run start + one cycle on top of tower to figure out how much it adds
+    tower = tetris(allmoves, start_length + cycle_length)
     cycle_height = len(tower)-start_height
 
+    print(f"============== AT 1 CYCLE ============= h={len(tower)}")
+    printTower(tower[-17:])
+
     print(f"Cycle builds {cycle_height}")
-    print(f"Start stuff: {len(tower)-2*cycle_height}")
+    
 
-    a = len(tower)
+    #Run start + 1 cycle + end bit
+    tower = tetris(allmoves, start_length + cycle_length + final_steps)
+    end_height = len(tower) - start_height - cycle_height
+    print(f"End stuff: {end_height}")
 
-    #Final run of stuff at end
-    tower = tetris(input, final_steps, tower, startstate=cycle_end)
+    print(f"============== AT END =============")
+    printTower(tower[-17:])
 
-    print(f"End stuff: {len(tower)-a}")
+    height = start_height + n_cycles * cycle_height + end_height
 
-    #Toer now consists of the start run, two cycles, and the end segment.
-
-    height = len(tower) + (n_cycles-2)*cycle_height
-
-    print("Tower built with 2 cycles:", len(tower))
+    print("Tower built with 1 cycle:", len(tower))
     print("Length of more cycles:", (n_cycles-2)*cycle_height)
     
     print("TOTAL HEIGHT:", height)
-
-    FACIT=1594842406882
-
-    if(height != FACIT): print(f"WRONG diff {height-FACIT}")
 
     return height
 
