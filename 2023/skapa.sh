@@ -11,14 +11,14 @@ else
 fi
 
 
-if [ -f "${DAY0}/run.py" ]; then
-    echo "${DAY0}/run.py already exists!"
+if [ -d "${DAY0}" ]; then
+    echo "${DAY0} already exists!"
     exit 1
 fi
 
 mkdir ${DAY0}
 
-cp templates/*.py ${DAY0}/run.py
+cp templates/*.py ${DAY0}/
 
 COOKIE=$(cat cookies.txt)
 URL="https://adventofcode.com/2023/day/${DAY}/input"
@@ -27,4 +27,4 @@ USER_AGENT="https://github.com/jstck/aoc/blob/master/2023/skapa.sh by john.stack
 
 curl -A "${USER_AGENT}" -o ${DAY0}/input.txt -b ${COOKIE} ${URL}
 
-cd ${DAY}
+cd ${DAY0}
