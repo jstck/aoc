@@ -1,15 +1,14 @@
 #!/bin/bash
 
 
-DAY=$(echo $1 | sed 's/^0*//')
-
-if [ $DAY -lt 10 ]
+if [ $# -eq 0 ]
 then
-    DAY0=$(echo "0${DAY}")
+  DAY0=$(date "+%d")
+  DAY=$(echo $DAY0 | sed 's/^0*//')
 else
-    DAY0=$DAY
+  DAY=$(echo $1 | sed 's/^0*//')
+  DAY0=$(echo "0${DAY}"| sed -E 's/.*(..)/\1/')
 fi
-
 
 if [ -d "${DAY0}" ]; then
     echo "${DAY0} already exists!"
