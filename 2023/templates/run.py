@@ -85,9 +85,19 @@ def fixInput(raw: str) -> list[str]:
     lines = [x.strip() for x in raw.split("\n")]
 
     #Remove trailing blank lines
-    while len(lines[-1])==0:
+    while len(lines)>0 and len(lines[-1])==0:
         lines.pop()
     return lines
+
+def failMsg(name: str, input: str, expected: str, output: str):
+    print(f"""Test {name} failed for input:
+==== Input:
+{input.strip()}
+==== Expected:
+{expected.strip()}
+==== Got:
+{output.strip()}
+""", file=sys.stderr)
 
 if tests:
 
@@ -109,13 +119,13 @@ if tests:
         if run1 and "output" in case and case["output"] is not None:
             output = part1(input)
             if output != case["output"]:
-                print(f"Test part 1failed for input:\n====\n{case['input'].strip()}\n====\n.\n\nGot:\n{output}\n\nExpected:\n{case['output']}\n")
+                failMsg("part1", str(case['input']), str(case['output']), str(output))
                 success = False
 
         if run2 and "output2" in case and case["output2"] is not None:
             output = part2(input)
             if output != case["output2"]:
-                print(f"Test part 2 failed for input:\n====\n{case['input'].strip()}\n====\nGot:\n{output}\n\nExpected:\n{case['output2']}\n")
+                failMsg("part2", str(case['input']), str(case['output']), str(output))
                 success = False
 
     if success:
