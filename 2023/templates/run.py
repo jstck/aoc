@@ -4,28 +4,24 @@ import sys
 import argparse
 import re
 
-match = re.search(r'aoc/?(\d+)/(\d+)', __file__)
-if match:
-    descr = "Advent of Code " + match.group(1) + ":" + match.group(2)
-else:
-    descr = "Advent of some kind of Code"
+verbosity: int = 0
 
-parser = argparse.ArgumentParser(description = descr)
 
-parser.add_argument('-1', action='store_true', help="Do part 1")
-parser.add_argument('-2', action='store_true', help="Do part 2")
-parser.add_argument('-t', action='store_true', help="Run tests")
-parser.add_argument('-f', '--input-file', default='input.txt')
-parser.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity")
+test_cases = [
+    {
+        "input": """
 
-args = parser.parse_args()
+""",
+        "output": 123,
+        "output2": None
+    },
+    {   "input": """
 
-tests = vars(args)["t"]
-run2 = vars(args)["2"]
-run1 = vars(args)["1"] or not run2 #Do part 1 if nothing else specified
-verbosity = vars(args)["verbose"]
-input_file = vars(args)["input_file"]
-
+""",
+        "output": None,
+        "output2": None
+    }
+]
 
 #Print controlled by verbosity level
 def vprint(*args) -> None:
@@ -49,23 +45,6 @@ def chunks(input: list[str], ints: bool=False) -> list[list[str]]:
         chunky.append(chunk)
     return chunky
 
-
-
-test_cases = [
-    {
-        "input": """
-
-""",
-        "output": 123,
-        "output2": None
-    },
-    {   "input": """
-
-""",
-        "output": None,
-        "output2": None
-    }
-]
 
 def part1(input: list[str]):
     import solution
@@ -99,58 +78,82 @@ def failMsg(name: str, input: str, expected: str, output: str):
 {output.strip()}
 """, file=sys.stderr)
 
-if tests:
 
-    success = True
+if __name__ == "__main__":
+    match = re.search(r'aoc/?(\d+)/(\d+)', __file__)
+    if match:
+        descr = "Advent of Code " + match.group(1) + ":" + match.group(2)
+    else:
+        descr = "Advent of some kind of Code"
 
-    for case in test_cases:
-        rawinput = case["input"]
+    parser = argparse.ArgumentParser(description = descr)
 
-        match = re.search(r'^FILE:([\S]+)$', rawinput.strip())
-        if match:
-            filename = match.group(1)
-            print("Loading", filename)
-            with open(filename, "r") as fp:
-                rawinput = fp.read()
+    parser.add_argument('-1', action='store_true', help="Do part 1")
+    parser.add_argument('-2', action='store_true', help="Do part 2")
+    parser.add_argument('-t', action='store_true', help="Run tests")
+    parser.add_argument('-f', '--input-file', default='input.txt')
+    parser.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity")
 
-        input = fixInput(rawinput)
+    args = parser.parse_args()
+
+    tests = vars(args)["t"]
+    run2 = vars(args)["2"]
+    run1 = vars(args)["1"] or not run2 #Do part 1 if nothing else specified
+    verbosity = vars(args)["verbose"]
+    input_file = vars(args)["input_file"]
+
+    if tests:
+
+        success = True
+
+        for case in test_cases:
+            rawinput = case["input"]
+
+            match = re.search(r'^FILE:([\S]+)$', rawinput.strip())
+            if match:
+                filename = match.group(1)
+                print("Loading", filename)
+                with open(filename, "r") as fp:
+                    rawinput = fp.read()
+
+            input = fixInput(rawinput)
+            
+
+            if run1 and "output" in case and case["output"] is not None:
+                output = part1(input)
+                if output != case["output"]:
+                    failMsg("part1", str(case['input']), str(case['output']), str(output))
+                    success = False
+
+            if run2 and "output2" in case and case["output2"] is not None:
+                output = part2(input)
+                if output != case["output2"]:
+                    failMsg("part2", str(case['input']), str(case['output']), str(output))
+                    success = False
+
+        if success:
+            print("All tests passed successfully!")
+
+    else:
+        try:
+            fp = open(input_file, "r")
+        except FileNotFoundError:
+            print("Input file not found, using stdin")
+            fp = sys.stdin
         
+        input = fixInput(fp.read())
 
-        if run1 and "output" in case and case["output"] is not None:
-            output = part1(input)
-            if output != case["output"]:
-                failMsg("part1", str(case['input']), str(case['output']), str(output))
-                success = False
+        if run1:
+            print("PART 1")
+            result1 = part1(input)
+            print("======")
+            print(result1)
 
-        if run2 and "output2" in case and case["output2"] is not None:
-            output = part2(input)
-            if output != case["output2"]:
-                failMsg("part2", str(case['input']), str(case['output']), str(output))
-                success = False
+        if run1 and run2:
+            print()
 
-    if success:
-        print("All tests passed successfully!")
-
-else:
-    try:
-        fp = open(input_file, "r")
-    except FileNotFoundError:
-        print("Input file not found, using stdin")
-        fp = sys.stdin
-    
-    input = fixInput(fp.read())
-
-    if run1:
-        print("PART 1")
-        result1 = part1(input)
-        print("======")
-        print(result1)
-
-    if run1 and run2:
-        print()
-
-    if run2:
-        print("PART 2")
-        result2 = part2(input)
-        print("======")
-        print(result2)
+        if run2:
+            print("PART 2")
+            result2 = part2(input)
+            print("======")
+            print(result2)
