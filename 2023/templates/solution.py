@@ -11,5 +11,5 @@ import sys
 def part1(input: list[str]):
     return ""
 
-#def part2(input: list[str]):
-#    return ""
+def part2(input: list[str]):
+    return ""
