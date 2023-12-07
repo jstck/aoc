@@ -101,14 +101,14 @@ def parse(input) -> tuple[list, list]:
     return (rules, messages)
 
 
-def transmogrify(rules: list, i: int, part2: bool) -> str:
+def transmogrify(rules: list, i: int, part2: bool = False) -> str:
 
     if part2:
         if i==8:
-            return transmogrify(rules, 42, part2) + "+"
+            return transmogrify(rules, 42, False) + "+"
 
         elif i==11:
-            return transmogrify(rules, 42, part2) + "+"
+            return transmogrify(rules, 42, False) + transmogrify(rules, 31, False)
 
     rule = rules[i]
     result = ""
@@ -134,6 +134,9 @@ def part1(input, part2=False):
     rules, messages = parse(input)
 
     count = 0
+
+    print("42: ", transmogrify(rules, 42))
+    print("31: ", transmogrify(rules, 31))
 
     regexp_str = "^" + transmogrify(rules, 0, part2) + "$"
 

@@ -4,30 +4,6 @@ import sys
 import argparse
 import re
 
-verbosity: int=0
-
-#Print controlled by verbosity level
-def vprint(*args) -> None:
-    if args[0]<= verbosity:
-        print(*args[1:])
-
-def chunks(input: list[str], ints: bool=False) -> list[list[str]]:
-    chunk = []
-    chunky = []
-    for line in input:
-        if len(line) == 0:
-            chunky.append(chunk)
-            chunk = []
-        else:
-            if ints:
-                chunk.append(int(line))
-            else:
-                chunk.append(line)
-
-    if len(chunk)>0:
-        chunky.append(chunk)
-    return chunky
-
 
 
 test_cases = [
@@ -71,6 +47,31 @@ humidity-to-location map:
         "output2": 46
     }
 ]
+
+verbosity: int=0
+
+#Print controlled by verbosity level
+def vprint(*args) -> None:
+    if args[0]<= verbosity:
+        print(*args[1:])
+
+def chunks(input: list[str], ints: bool=False) -> list[list[str]]:
+    chunk = []
+    chunky = []
+    for line in input:
+        if len(line) == 0:
+            chunky.append(chunk)
+            chunk = []
+        else:
+            if ints:
+                chunk.append(int(line))
+            else:
+                chunk.append(line)
+
+    if len(chunk)>0:
+        chunky.append(chunk)
+    return chunky
+
 
 def part1(input: list[str]):
     import solution
