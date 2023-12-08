@@ -107,9 +107,9 @@ if __name__ == "__main__":
         success = True
 
         for case in test_cases:
-            rawinput = case["input"]
+            rawinput = case["input"].strip()
 
-            match = re.search(r'^FILE:([\S]+)$', rawinput.strip())
+            match = re.search(r'^FILE:([\S]+)$', rawinput)
             if match:
                 filename = match.group(1)
                 print("Loading", filename)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
             if run2 and "output2" in case and case["output2"] is not None:
                 output = part2(input)
                 if output != case["output2"]:
-                    failMsg("part2", str(case['input']), str(case['output']), str(output))
+                    failMsg("part2", str(case['input']), str(case['output2']), str(output))
                     success = False
 
         if success:
