@@ -36,6 +36,7 @@ def chunks(input, ints=False):
     chunk = []
     chunky = []
     for line in input:
+        line = line.strip()
         if len(line) == 0:
             chunky.append(chunk)
             chunk = []
@@ -84,13 +85,15 @@ def fixtoken(t):
     assert(len(t)==3)
     return t[1]
 
-def parse(input) -> tuple[list, list]:
+def parse(input) -> tuple[dict, list]:
     rules = {}
     messages = []
 
     c = chunks(input)
 
     for line in c[0]:
+        line = line.strip()
+        if len(line) == 0: continue
         (num,rule) = [p.strip() for p in line.split(":")]
         num = int(num)
         rule = [fixtoken(t) for t in rule.split(" ")]
@@ -101,14 +104,24 @@ def parse(input) -> tuple[list, list]:
     return (rules, messages)
 
 
-def transmogrify(rules: list, i: int, part2: bool = False) -> str:
+def transmogrify(rules: dict, i: int, part2: bool = False) -> str:
 
     if part2:
         if i==8:
             return transmogrify(rules, 42, False) + "+"
 
         elif i==11:
-            return transmogrify(rules, 42, False) + transmogrify(rules, 31, False)
+
+            #This has been experimentally tested to see how many layers of (42 42 ... 31 31 ...) until no more matches occur.
+            bunches = 4
+            rule42 = transmogrify(rules, 42, False)
+            rule31 = transmogrify(rules, 31, False)
+            combos = [ rule42+rule31 ]
+            for i in range(bunches):
+                combos.append(rule42 + combos[-1] + rule31)
+
+            return "(" + "|".join(combos) + ")"
+
 
     rule = rules[i]
     result = ""
@@ -135,8 +148,8 @@ def part1(input, part2=False):
 
     count = 0
 
-    print("42: ", transmogrify(rules, 42))
-    print("31: ", transmogrify(rules, 31))
+    #print("42: ", transmogrify(rules, 42))
+    #print("31: ", transmogrify(rules, 31))
 
     regexp_str = "^" + transmogrify(rules, 0, part2) + "$"
 
@@ -167,68 +180,69 @@ def fixInput(raw):
         lines.pop()
     return lines
 
-if tests:
+if __name__ == "__main__":
+    if tests:
 
-    success = True
+        success = True
 
-    def splitLines(input):
-        return 
+        def splitLines(input):
+            return 
 
-    for case in test_cases:
-        rawinput = case["input"]
+        for case in test_cases:
+            rawinput = case["input"]
 
-        match = re.search(r'^FILE:([\S]+)$', rawinput.strip())
-        if match:
-            filename = match.group(1)
-            print("Loading", filename)
-            with open(filename, "r") as fp:
-                rawinput = fp.read()
+            match = re.search(r'^FILE:([\S]+)$', rawinput.strip())
+            if match:
+                filename = match.group(1)
+                print("Loading", filename)
+                with open(filename, "r") as fp:
+                    rawinput = fp.read()
 
-        input = fixInput(rawinput)
+            input = fixInput(rawinput)
+            
+
+            if run1 and "output" in case and case["output"] is not None:
+                output = part1(input)
+                if output != case["output"]:
+                    print(f"Test part 1failed for input:\n====\n{case['input'].strip()}\n====\n.\n\nGot:\n{output}\n\nExpected:\n{case['output']}\n")
+                    success = False
+
+            if run2 and "output2" in case and case["output2"] is not None:
+                output = part2(input)
+                if output != case["output2"]:
+                    print(f"Test part 2 failed for input:\n====\n{case['input'].strip()}\n====\nGot:\n{output}\n\nExpected:\n{case['output2']}\n")
+                    success = False
+
+        if success:
+            print("All tests passed successfully!")
+
+    else:
+        try:
+            fp = open(input_file, "r")
+        except FileNotFoundError:
+            print("Input file not found, using stdin")
+            fp = sys.stdin
         
+        input = fixInput(fp.read())
 
-        if run1 and "output" in case and case["output"] is not None:
-            output = part1(input)
-            if output != case["output"]:
-                print(f"Test part 1failed for input:\n====\n{case['input'].strip()}\n====\n.\n\nGot:\n{output}\n\nExpected:\n{case['output']}\n")
-                success = False
+        if run1:
+            print("Running part 1")
+            result1 = part1(input)
+        if run2:
+            print("Running part 2")
+            result2 = part2(input)
 
-        if run2 and "output2" in case and case["output2"] is not None:
-            output = part2(input)
-            if output != case["output2"]:
-                print(f"Test part 2 failed for input:\n====\n{case['input'].strip()}\n====\nGot:\n{output}\n\nExpected:\n{case['output2']}\n")
-                success = False
-
-    if success:
-        print("All tests passed successfully!")
-
-else:
-    try:
-        fp = open(input_file, "r")
-    except FileNotFoundError:
-        print("Input file not found, using stdin")
-        fp = sys.stdin
-    
-    input = fixInput(fp.read())
-
-    if run1:
-        print("Running part 1")
-        result1 = part1(input)
-    if run2:
-        print("Running part 2")
-        result2 = part2(input)
-
-    print()
-
-    if run1:
-        print("PART 1")
-        print("======")
-        print(result1)
-
-    if run1 and run2:
         print()
 
-    if run2:
-        print("PART 2")
-        print("======")
-        print(result2)
+        if run1:
+            print("PART 1")
+            print("======")
+            print(result1)
+
+        if run1 and run2:
+            print()
+
+        if run2:
+            print("PART 2")
+            print("======")
+            print(result2)
