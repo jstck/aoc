@@ -3,7 +3,6 @@
 import sys
 import argparse
 import re
-import copy
 
 verbosity: int = 0
 
