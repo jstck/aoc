@@ -1,30 +1,26 @@
 #!/usr/bin/env python3
 
 import sys
+from functools import cache
 
-#Cache of (springs, counts) tuples and number of solutions
-memo = {}
-
-def subsolve(springs, counts, curcount, prev) -> int:
+@cache
+def subsolve(springs: str, counts, curcount) -> int:
     #print(springs,counts,curcount)
     
     if len(springs) == 0:
 
         #No more springs
         if curcount == 0 and len(counts) == 0:
-            #print(prev)
             return 1
         
         #Current set of springs finished
         if len(counts) == 1 and counts[0] == curcount:
-            #print(prev)
             return 1
         
         return 0
     
     if len(counts) == 0:
         if curcount == 0 and "#" not in springs:
-            #print(prev+springs)
             return 1
         return 0
     
@@ -34,28 +30,19 @@ def subsolve(springs, counts, curcount, prev) -> int:
     #We're not currently in a row of springs
     if curcount == 0:
 
-        x = -1
-
-        if (springs,counts) in memo:
-            return memo[(springs,counts)]
-
         if head == ".":
             #Skip this one and continue
-            x = subsolve(tail, counts, 0, prev+head)
+            return subsolve(tail, counts, 0)
         
         elif head == "#":
             #Start a new count on this one
-            x = subsolve(tail,counts, 1, prev+head)
+            return subsolve(tail,counts, 1)
         
         elif head == "?":
 
             #Try both and memorize
-            x = subsolve(tail, counts, 0, prev+".") + subsolve(tail, counts, 1, prev+"#")
-        
-        assert(x>=0)
-        memo[(springs,counts)] = x
-        return x
-        
+            return subsolve(tail, counts, 0) + subsolve(tail, counts, 1)
+                
     #Current quota fulfilled
     elif curcount == counts[0]:
         if head == "#":
@@ -73,7 +60,7 @@ def subsolve(springs, counts, curcount, prev) -> int:
                     #print(prev+springs)
                     return 1
                 
-            return subsolve(tail, counts[1:], 0, prev+".")
+            return subsolve(tail, counts[1:], 0)
     
     #Increase current count
     else:
@@ -84,12 +71,12 @@ def subsolve(springs, counts, curcount, prev) -> int:
             return 0
         else:
             #Both ? and # have to be a spring
-            return subsolve(tail, counts, curcount+1, prev+"#")
+            return subsolve(tail, counts, curcount+1)
         
     assert(False)
 
 def solve(t):
-    return subsolve(t[0], t[1], 0, "")
+    return subsolve(t[0], t[1], 0)
 
 
 def unfold(t):
@@ -108,23 +95,16 @@ if __name__ == "__main__":
         springs, counts = line.split(" ")
         counts = tuple([int(x) for x in counts.split(",")])
         items.append((springs,counts))
-        maxlen = max(maxlen, len(springs))
 
     sum = 0
     for t in items:
-        c = solve(t)
-        #print(c)
-        sum += c
+        sum += solve(t)
 
     print("Part 1:", sum)
 
     items2 = map(unfold, items)
     sum = 0
     for t in items2:
-        c = solve(t)
-        #print(f"{t[0]}: {c}")
-        sum += c
+        sum += solve(t)
 
     print("Part 2:", sum)
-
-    print(len(memo))
