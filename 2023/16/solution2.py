@@ -73,7 +73,7 @@ def getEnergy(grid: list[str], x: int , y: int, dir: str, printout=False) -> int
         for row in range(len(grid)):
             r = []
             for col in range(len(grid[0])):
-                if (row, col) in energized:
+                if (col, row) in energized:
                     r.append("#")
                 else:
                     r.append(".")
