@@ -141,11 +141,11 @@ def part2(input: list[str]):
 
     for x in range(size_x):
         edges.append((x,0,DOWN))
-        edges.append((x,size_y,UP))
+        edges.append((x,size_y-1,UP))
 
     for y in range(size_y):
         edges.append((0,y,RIGHT))
-        edges.append((size_x,y,LEFT))
+        edges.append((size_x,y-1,LEFT))
 
     maxenergy = 0
     for (x,y,dir) in edges:

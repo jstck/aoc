@@ -17,6 +17,7 @@ def visitnodes(visited: set[tuple[int,int,str]], grid: list[str], q: Queue[tuple
     cur = (x,y,dir)
 
     size_x, size_y = len(grid[0]), len(grid)
+    
 
     #Check if we're off the grid
     if x<0 or x>=size_x or y<0 or y>=size_y:
@@ -85,7 +86,7 @@ def getEnergy(grid: list[str], x: int , y: int, dir: str, printout=False) -> int
 def part1(input: list[str]):
     grid = input
 
-    return getEnergy(grid, 0, 0, RIGHT)
+    return getEnergy(grid, 0, 0, RIGHT, True)
 
     
 
@@ -98,11 +99,11 @@ def part2(input: list[str]):
 
     for x in range(size_x):
         edges.append((x,0,DOWN))
-        edges.append((x,size_y,UP))
+        edges.append((x,size_y-1,UP))
 
     for y in range(size_y):
         edges.append((0,y,RIGHT))
-        edges.append((size_x,y,LEFT))
+        edges.append((size_x-1,y,LEFT))
 
     maxenergy = 0
     for (x,y,dir) in edges:
