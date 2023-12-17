@@ -2,6 +2,7 @@
 
 from queue import PriorityQueue
 import sys
+import time
 
 sys.path.append("../..")
 from lib.aoc import *
@@ -66,6 +67,8 @@ def findpath(grid: list[list[int]], moves: dict[str,tuple[int,int,str]]):
         visited.add(state)
 
         if pos == finish:
+            return c
+
             #Check the path cost by traversing grid
             solution = fullpath[1:]
             x=y=0
@@ -127,16 +130,28 @@ def findpath(grid: list[list[int]], moves: dict[str,tuple[int,int,str]]):
     return 0
 
 if __name__ == "__main__":
+    t0 = time.process_time()
+
     input = readinput()
 
     grid = [ [int(x) for x in list(row)] for row in input]
+
+    t1 = time.process_time()
 
     p1moves = makelongermoves(1,3)
     p1 = findpath(grid, p1moves)
     print("Part 1:", p1)
 
-    print()
+    t2 = time.process_time()
 
     p2moves = makelongermoves(4,10)
     p2 = findpath(grid, p2moves)
     print("Part 2:", p2)
+
+    t3 = time.process_time()
+
+    print()
+    print(f"Parsing:    {t1-t0:0.4f}s")
+    print(f"Part1:      {t2-t1:0.3f}s")
+    print(f"Part2:      {t3-t2:0.3f}s")
+    print(f"Total:      {t3-t0:0.3f}s")
