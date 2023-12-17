@@ -82,11 +82,32 @@ def findpath(grid: list[list[int]], part2=False):
     bounds = (size_x, size_y)
     finish = (size_x-1, size_y-1)
 
-    frontier.put((0, (0,0), ("x", "x", "x")))
+    #c0 = grid[0][0]
+
+    #Make a heuristics grid, allowing unlimited "closest" moves to target (ignoring the max-3 limit)
+    H = [ [0] * size_x for _ in range(size_y)]
+
+    #Target corner
+    H[size_y-1][size_x-1] = grid[size_y-1][size_x-1]
+
+    #bottom row
+    for x in range(size_x-2,-1,-1):
+        H[size_y-1][x] = H[size_y-1][x+1] + grid[size_y-1][x]
+    
+    #rightmost column
+    for y in range(size_y-2,-1,-1):
+        H[y][size_x-1] = H[y+1][size_x-1] + grid[y][size_x-1]
+
+    #Rest, bottom up
+    for y in range(size_y-2,-1,-1):
+        for x in range(size_x-2,-1,-1):
+            H[y][x] = grid[y][x] + min(H[y+1][x], H[y][x+1])
+
+    frontier.put((0, 0, (0,0), ("x", "x", "x")))
 
 
     while not frontier.empty():
-        c, pos, fullpath = frontier.get()
+        _, c, pos, fullpath = frontier.get()
 
         x,y = pos[0], pos[1]
         path = fullpath[-3:]
@@ -166,7 +187,16 @@ def findpath(grid: list[list[int]], part2=False):
 
             if not valid: continue
 
-            frontier.put((newcost, nextpos, nextpath))
+            #Calcumalate an a* heuristic
+            #Manhattan distance
+            #h = newcost + (size_x-nx) + (size_y-ny)
+            #Cheapest (including disallowed) path
+            #h = newcost + H[ny][nx]
+            #This is just Dijkstra
+            h = newcost
+
+
+            frontier.put((h, newcost, nextpos, nextpath))
 
     print("NO PATH FOUND")
     return 0
