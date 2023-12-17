@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 from queue import PriorityQueue
-import re
 import sys
-
 
 sys.path.append("../..")
 from lib.aoc import *
@@ -15,7 +13,7 @@ backwards = {
     "r": "l",
     "x": "y",
 }
-
+#All 1-step moves
 moves1 = {
     "u": (0,-1, "d"),
     "d": (0,1, "u"),
@@ -23,34 +21,14 @@ moves1 = {
     "r": (1,0, "l"),
 }
 
-moves2 = {}
-for m in moves1.keys():
-    (dx, dy, reverse) = moves1[m]
-    for next in list("udlr"):
-        if backwards[m] == next:
-            continue
-        dx1, dy1, r1 = moves1[next]
-        newmove = m + next
-        moves2[newmove] = (dx+dx1,dy+dy1, reverse)
+def makelongermoves(min, max):
+    result = {}
+    for d in moves1.keys():
+        (dx, dy, reverse) = moves1[d]
+        for i in range(min,max+1):
+            result[d*i] = (dx*i,dy*i,reverse)
+    return result
 
-
-moves3 = {}
-for m in moves2.keys():
-    (dx, dy, reverse) = moves2[m]
-    for next in list("udlr"):
-        if backwards[m[-1]] == next:
-            continue
-        dx1, dy1, r1 = moves1[next]
-        newmove = m + next
-        moves3[newmove] = (dx+dx1,dy+dy1, reverse)
-
-p1moves = moves1|moves2|moves3
-
-p2moves = {}
-for d in moves1.keys():
-    (dx, dy, reverse) = moves1[d]
-    for i in range(4,11):
-        p2moves[d*i] = (dx*i,dy*i,reverse)
         
 def inside(pos,bounds):
     x,y=pos
@@ -61,38 +39,27 @@ def inside(pos,bounds):
 
     return True
 
-
-fourstraight = re.compile("uuuu|dddd|llll|rrrr")
-
-def findpath(grid: list[list[int]], part2=False):
-    part1 = not part2
+def findpath(grid: list[list[int]], moves: dict[str,tuple[int,int,str]]):
 
     size_x, size_y = len(grid[0]), len(grid)
 
-    if part2:
-        moves = p2moves
-    else:
-        moves = p1moves
- 
-    #visited = set() #Node visited at all
-    visited = set() #(pos, last 3 bits of path)
+    visited = set() #(pos, step made to get here)
     
     frontier = PriorityQueue()
 
     bounds = (size_x, size_y)
     finish = (size_x-1, size_y-1)
 
-    frontier.put((0, (0,0), ("x", "x", "x")))
+    frontier.put((0, (0,0), ("x",)))
 
 
     while not frontier.empty():
         c, pos, fullpath = frontier.get()
 
-        x,y = pos[0], pos[1]
-        path = fullpath[-3:]
+        laststep = fullpath[-1]
 
-        #We have visited this node from the same direction
-        state = (pos,path)
+        #We have visited this node via the same path (last3)
+        state = (pos,laststep)
         if state in visited:
             continue
 
@@ -100,7 +67,7 @@ def findpath(grid: list[list[int]], part2=False):
 
         if pos == finish:
             #Check the path cost by traversing grid
-            solution = fullpath[3:]
+            solution = fullpath[1:]
             x=y=0
             cost=0
             for d in solution:
@@ -115,20 +82,19 @@ def findpath(grid: list[list[int]], part2=False):
 
             return c
         
+        x,y = pos
+        
         for dir in moves.keys():
             dx, dy, reverse = moves[dir]
 
             #No reversing allowed
-            laststep = path[-1]
             if reverse == laststep:
                 continue
 
             #Make sure we don't keep going in same direction
-            if part2:
-                laststep = path[-1]
-                nextstep = dir[0]
-                if laststep == nextstep:
-                    continue
+            nextstep = dir[0]
+            if laststep == nextstep:
+                continue
 
             nx, ny = x+dx, y+dy
             nextpos = (nx,ny)
@@ -136,18 +102,12 @@ def findpath(grid: list[list[int]], part2=False):
             #Don't go outside grid
             if not inside(nextpos, bounds): continue
 
-            #Ban 4 straight of the same move
-            if part1:
-                lastpath = path + tuple(dir)
-                if fourstraight.search("".join(lastpath)): continue
-
             nextpath = fullpath + tuple(dir)
-            nextstate = (nextpos, nextpath[-3])
+            nextstate = (nextpos, nextpath[-1])
 
-            #Don't enqueue to visited nodes
+            #Don't enqueue visited nodes
             if nextstate in visited: continue
 
-            valid = True
             if len(dir) == 1:
                 #Single step
                 newcost = c + grid[ny][nx]
@@ -159,12 +119,7 @@ def findpath(grid: list[list[int]], part2=False):
                     dx1, dy1, r = moves1[istep]
                     nx1 += dx1
                     ny1 += dy1
-                    if not inside((nx1, ny1), bounds):
-                        valid = False
-                        break
                     newcost += grid[ny1][nx1]
-
-            if not valid: continue
 
             frontier.put((newcost, nextpos, nextpath))
 
@@ -176,10 +131,12 @@ if __name__ == "__main__":
 
     grid = [ [int(x) for x in list(row)] for row in input]
 
-    p1 = findpath(grid)
+    p1moves = makelongermoves(1,3)
+    p1 = findpath(grid, p1moves)
     print("Part 1:", p1)
 
     print()
 
-    p2 = findpath(grid, True)
+    p2moves = makelongermoves(4,10)
+    p2 = findpath(grid, p2moves)
     print("Part 2:", p2)
