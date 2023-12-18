@@ -48,8 +48,10 @@ def dig(input: list[str]):
         px1,py1=x1,y1
         px2,py2=x2,y2
 
-    print("Part 1:", (a1-b1+l1)//2+1)
-    print("Part 2:", (a2-b2+l2)//2+1)
+    #Circumference//2+1 is added to area to account for the width of the border
+
+    print("Part 1:", abs(a1-b1)//2 +l1//2+1 )
+    print("Part 2:", abs(a2-b2)//2 +l2//2+1 )
 
 if __name__ == "__main__":
     dig(sys.stdin.readlines())
