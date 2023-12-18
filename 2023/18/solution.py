@@ -30,8 +30,8 @@ def dig(input: list[str]):
         (dir1, dist1, color) = row.strip().split()
         dist1 = int(dist1)
 
-        dist2 = int(color[0:5], 16)
-        dir2 = color[5]
+        dist2 = int(color[2:-2], 16)
+        dir2 = color[-2]
 
         l1 += dist1
         l2 += dist2
