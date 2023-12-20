@@ -262,7 +262,7 @@ def part2(rules):
 
     return mapCondition("in", 0, RangeSet(allvalues), rules)
 
-unstupid = False
+unstupid = True
 
 if __name__ == "__main__":
     input = readinput()

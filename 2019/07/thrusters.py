@@ -3,8 +3,9 @@
 import sys
 import argparse
 import re
-import IntCodeVM
+from IntCodeVM import IntCodeVM
 import itertools
+from typing import Literal
 
 match = re.search(r'aoc/?(\d+)/(\d+)', __file__)
 if match:
@@ -12,32 +13,10 @@ if match:
 else:
     descr = "Advent of some kind of Code"
 
-parser = argparse.ArgumentParser(description = descr)
-
-parser.add_argument('-1', action='store_true', help="Do part 1")
-parser.add_argument('-2', action='store_true', help="Do part 2")
-parser.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity")
-parser.add_argument('--test', '-t', action='store_true', help="Run test")
-
-args = parser.parse_args()
-
-test = vars(args)["test"]
-part2 = vars(args)["2"]
-part1 = vars(args)["1"] or not (part2 or test) #Do part 1 if nothing else specified
-verbosity = vars(args)["verbose"]
-
-#Print controlled by verbosity level
-def vprint(*args):
-    if args[0]<= verbosity:
-        print(*args[1:])
-
-#for line in sys.stdin.readlines():
-#    pass
-
 def simStep(program, phase, input):
-    vm = IntCodeVM.vm(program, [phase, input], False)
+    vm = IntCodeVM(program, [phase, input], False)
     vm.run()
-    return vm.output_buffer[0]
+    return vm.get_output()
 
 def simRun(program, phases):
     signal = 0
@@ -46,56 +25,103 @@ def simRun(program, phases):
     return signal
 
 
-if test:
+#Print controlled by verbosity level
+def vprint(*args):
+    if args[0]<= verbosity:
+        print(*args[1:])
+
+def part1(program: list[int]) -> tuple[int, tuple[int]]:
+
+    maxsignal = -1
+    bestphases = (0,0,0,0,0)
+
+    for phases in itertools.permutations((0, 1, 2, 3, 4)):
+        val = simRun(program, phases)
+        if val > maxsignal:
+            maxsignal = val
+            bestphases = phases
+            #print("New highscore:", val)
+            #print(phases)
+            #print()
+
+    return (maxsignal, bestphases) # type: ignore
+
+def part2(program: list[int]) -> tuple[int, tuple[int]]:
+    phasesettings = (5, 6, 7, 8, 9)
+    maxsignal = 0
+    bestphases = (0, 0, 0, 0, 0)
+
+    for phases in itertools.permutations(phasesettings):
+        lastsignal = signal = 0
+        #print(phases)
+        vms: list[IntCodeVM]= []
+        for phase in phases:
+            vm = IntCodeVM(program, [phase], False)
+            vm.halt_output(True)
+            vms.append(vm)
+
+        runs = 0
+        halted = False
+        while not halted:
+            runs += 1
+            #if runs % 1000 == 0:
+            #  print(f"Run {runs} signal {signal}")
+            for i in range(len(vms)):
+                vms[i].add_input(signal)
+                #print(vms[i].input_buffer)
+                vms[i].run()
+                #If a VM halted, break here (no output will happen)
+                if vms[i].state == IntCodeVM.STATE_HALT:
+                    halted = True
+                    break
+
+                signal = vms[i].get_output()
+            lastsignal = signal #Only record output from last VM as "record signal"
+                
+        #print("Phases", str(phases), runs, "runs")
+
+        if lastsignal > maxsignal:
+            #print(f"New record signal {lastsignal} phases {str(phases)} afer {runs} runs")
+            maxsignal = lastsignal
+            bestphases = phases
+
+    return (maxsignal, bestphases) # type: ignore
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description = descr)
+
+    parser.add_argument('-1', action='store_true', help="Do part 1")
+    parser.add_argument('-2', action='store_true', help="Do part 2")
+    parser.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity")
+    #parser.add_argument('--test', '-t', action='store_true', help="Run test")
+
+    args = parser.parse_args()
+
+    p2 = vars(args)["2"]
+    p1 = vars(args)["1"] or not p2 #Do part 1 if nothing else specified
+    verbosity = vars(args)["verbose"]
+
+
+    #for line in sys.stdin.readlines():
+    #    pass
+
+
     programs = []
     for p in sys.stdin.readlines():
         programs.append([int(i.strip()) for i in p.split(',')])
 
-    print(programs)
-    print(simRun(programs[0], [4, 3, 2, 1, 0]))
-    print(simRun(programs[1], [0, 1, 2, 3, 4]))
-    print(simRun(programs[2], [1, 0, 4, 3, 2]))
-    sys.exit(0)
 
-program = [int(i.strip()) for i in sys.stdin.readline().split(',')]
+    if p1:
+        for program in programs:
+            (signal, phases) = part1(program)
+            print(f"Max signal: {signal}, phases {str(phases)}")
 
-maxval = 0
-
-if part1:
-    for phases in itertools.permutations([0, 1, 2, 3, 4]):
-        val = simRun(program, phases)
-        if val > maxval:
-            maxval = val
-            print("New highscore:", val)
-            print(phases)
-            print()
-        
-if part2:
-    phasesettings = [5, 6, 7, 8, 9]
-    maxsignal = 0
-    for phases in itertools.permutations(phasesettings):
-        signal = 0
-        #print(phases)
-        vms = [IntCodeVM.vm(program, [phase], True) for phase in phases]
-        halted = False
-        runs = 0
-        while not halted and runs < 2:
-            runs += 1
-            for i in range(len(vms)):
-                vms[i].add_input(signal)
-                print(vms[i].input_buffer)
-                vms[i].run()
-                signal = vms[i].output_buffer.pop()
-                halted = halted or (vms[i].state == vms[i].STATE_HALT)
-                print("HALTED", i, vms[i].state, signal)
-                print()
-
-        print("Phases", str(phases), runs, "runs")
-
-        if signal > maxsignal:
-            print("New record signal", signal, "at", str(phases))
-            maxsignal = signal
-        
+            
+    if p2:
+        for program in programs:
+            (signal, phases) = part2(program)
+            print(f"Max signal: {signal}, phases {str(phases)}")        
 
             
 
