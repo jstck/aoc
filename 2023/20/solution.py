@@ -100,7 +100,9 @@ def runcircuit(circuit: dict[str,Gate], start: str, count: int, monitor: str = "
             tick, _, signal, source, destination = q.get()
 
             if destination == monitor and signal == 1:
-                monitorcount[source] = round
+                if not source in monitorcount: #Only count first occurence
+                    monitorcount[source] = round
+
                 print(f"High signal {source} -> {destination} on round {round}")
                 
                 #Count on being so lucky that all signals loop every N cycles starting from 0
