@@ -69,31 +69,7 @@ class Brick:
     def __repr__(self):
         return str(self)
 
-#FIXME:
-#This doesn't cover the case where A supports B and C, and B and C support D. Neither B or C will cause D to fall.
-cascache: dict[str,set[str]] = {}
 def cascade(brick: str, below: dict[str,set[str]], above: dict[str,set[str]]) -> set[str]:
-
-    print(f"Cascade {brick}")
-
-    if brick in cascache: return cascache[brick]
-
-    fallen_bricks: set[str] = set([brick])
-
-    for a in above[brick]:
-        if len(below[a].difference(fallen_bricks))==0:
-            fallen_bricks.add(a)
-            fallen_bricks.update(cascade(a, below, above))
-
-    fallen_bricks.remove(brick)
-
-    cascache[brick] = fallen_bricks
-    return fallen_bricks   
-
-
-def cascade2(brick: str, below: dict[str,set[str]], above: dict[str,set[str]]) -> set[str]:
-
-    if brick in cascache: return cascache[brick]
 
     fallen_bricks: set[str] = set([brick])
 
@@ -105,19 +81,15 @@ def cascade2(brick: str, below: dict[str,set[str]], above: dict[str,set[str]]) -
 
         candidates = above[b]
         for c, belows in below.items():
-            #Bricks touching a fallen brick
-            if c in candidates:
+            #Bricks touching something that has fallen (but not fallen themselves yet)
+            if c in candidates and c not in fallen_bricks:
                 if len(belows.difference(fallen_bricks)) == 0: #No remaining supports
                     fallen_bricks.add(c)
                     q.put_nowait(c)
 
-                    if c in cascache:
-                        fallen_bricks.update(cascache[c])
-
     #Start brick is not to be counted.
     fallen_bricks.remove(brick)
 
-    cascache[brick] = fallen_bricks
     return fallen_bricks
     
 #Return
@@ -219,7 +191,7 @@ def fallingbricks(bricks: list[Brick]) -> tuple[int,int]:
     bricks.reverse()
 
     for b in bricks:
-        fallen = cascade2(b.label, bricks_below, bricks_above)
+        fallen = cascade(b.label, bricks_below, bricks_above)
         
         #print(f"Removing {b} cascades to {', '.join(fallen)}")
 
