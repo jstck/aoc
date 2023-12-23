@@ -1,17 +1,7 @@
 #!/usr/bin/env python3
 
-import functools
-from functools import cache
-from itertools import combinations
-import itertools
-import collections
-from queue import PriorityQueue, SimpleQueue
-import heapq
-from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple, TypeAlias
-
-import math
-import re
+from queue import PriorityQueue
+from typing import TypeAlias
 import sys
 
 Pos: TypeAlias = tuple[int,int]
@@ -53,7 +43,7 @@ def findvertices(grid: list[str]) -> list[Pos]:
     return vertices
 
 
-def findneighbours(grid: list[str], startpos: Pos, vertices: list[Pos], part2=False) -> list[tuple[Pos,tuple[tuple[WeightedPos,...]]]]:
+def findneighbours(grid: list[str], startpos: Pos, vertices: list[Pos], part2=False) -> list[WeightedPos]:
     #print("Neighboursing", startpos)
     neighbours = []
 
@@ -115,6 +105,7 @@ def buildgraph(grid: list[str], part2=False) -> tuple[Graph,Pos,Pos]:
 
     return graph, startpos, finishpos
 
+
 def findlongest(graph: Graph, start: Pos, finish: Pos) -> int:
 
     #queue tuple with cost so far and path of (x,y) tuples
@@ -148,12 +139,13 @@ def findlongest(graph: Graph, start: Pos, finish: Pos) -> int:
 
     return maxpath
 
-#Naive solution, works fine for part 1 and part 2 sample...
-def findpaths(grid: list[str], slopes=True) -> list[tuple[tuple[int,int],...]]:
+
+#Naive solution, works fine for part 1 and part 2 sample. Not recommended for the real deal
+def findpaths(grid: list[str], slopes=True) -> list[tuple[Pos,...]]:
 
     #path is a tuple of (x,y) tuples
 
-    q: PriorityQueue[tuple[int,tuple[tuple[int,int],...]]] = PriorityQueue()
+    q: PriorityQueue[tuple[int,tuple[Pos,...]]] = PriorityQueue()
 
     size_x = len(grid[0])
     size_y = len(grid)
@@ -213,7 +205,6 @@ def findpaths(grid: list[str], slopes=True) -> list[tuple[tuple[int,int],...]]:
     return solutions
 
 
-
 def part1(input: list[str]) -> int:
     #allpaths = findpaths(input)
     #return max(map(len,allpaths))-1
@@ -224,7 +215,6 @@ def part1(input: list[str]) -> int:
 def part2(input: list[str]) -> int:
     graph, startpos, finishpos = buildgraph(input,True)
     return findlongest(graph, startpos, finishpos)
-    
 
 if __name__ == "__main__":
     input = readinput()
