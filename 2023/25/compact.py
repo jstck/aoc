@@ -19,4 +19,4 @@ for (a,b) in cuts:
 
 sizes = [len(G.subgraph(c)) for c in nx.connected_components(G)]
 print(f"Found {len(sizes)} subgraphs of sizes {', '.join(map(str,sizes))}")
-print("THE ANSWER:",reduce(mul, sizes))
+print("THE ANSWER:", reduce(mul, sizes))
