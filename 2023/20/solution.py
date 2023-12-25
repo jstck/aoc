@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import functools
-from functools import cache
-from itertools import combinations
-import itertools
-import collections
 from collections import defaultdict
 from queue import PriorityQueue
-import heapq
-from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
 
 import math
-import re
 import sys
 
 GATE_BROADCASTER = 0

@@ -1,11 +1,3 @@
-import functools
-import itertools
-import collections
-from queue import PriorityQueue
-import heapq
-from dataclasses import dataclass
-import math
-
 def part1(input: list[str]):
     sum = 0
     for line in input:
