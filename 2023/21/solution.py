@@ -13,12 +13,13 @@ from typing import Dict, List, Set, Tuple, Optional, Union
 import math
 import re
 import sys
+import numpy as np
 
 
 sys.path.append("../..")
 from lib.aoc import *
 
-def traversegrid(grid: list[str], startpos: Optional[tuple[int,int]]=None, maxsteps: int=-1) -> list[list[Union[int,None]]]:
+def traversegrid(grid: list[str], startpos: Optional[tuple[int,int]]=None, maxsteps: int=-1, tiling=False) -> dict[tuple[int,int],int]:
     rocks: set[tuple[int,int]] = set()
     
     size_x = len(grid[0])
@@ -34,7 +35,7 @@ def traversegrid(grid: list[str], startpos: Optional[tuple[int,int]]=None, maxst
 
     assert startpos is not None
 
-    distances: list[list[Union[int,None]]] = [ [None]*size_x for _ in range(size_y)]
+    distances: dict[tuple[int,int],int] = {}
 
     #We are already here
     #distances[startpos[1]][startpos[0]] = 0
@@ -49,11 +50,11 @@ def traversegrid(grid: list[str], startpos: Optional[tuple[int,int]]=None, maxst
         (x,y) = pos
 
         #Someone has already been here
-        if distances[y][x] is not None and distances[y][x] <= dist:
+        if pos in distances and distances[pos] <= dist:
             continue
 
         #My score!
-        distances[y][x] = dist
+        distances[pos] = dist
 
         #Enqueue all the valid neighbours
         newdist = dist+1
@@ -63,55 +64,117 @@ def traversegrid(grid: list[str], startpos: Optional[tuple[int,int]]=None, maxst
         for (dx,dy) in [(-1,0), (1,0), (0,-1), (0,1)]:
             x1,y1 = (pos[0]+dx,pos[1]+dy)
             newpos = (x1,y1)
+            
+            if not tiling:
+                #Don't go outside grid
+                if x1 < 0 or x1 >= size_x: continue
+                if y1 < 0 or y1 >= size_y: continue
+                rockpos = (x1,y1)
+            else:
+                #Wrap around
+                mapx = x1 % size_x
+                mapy = y1 % size_y
+                rockpos = (mapx,mapy)
 
             #Skip rocks
-            if newpos in rocks: continue
-            
-            #Don't go outside grid
-            if x1 < 0 or x1 >= size_x: continue
-            if y1 < 0 or y1 >= size_y: continue
+            if rockpos in rocks: continue
 
             #Don't go to visited nodes
-            if distances[y1][x1] is not None and distances[y1][x1] <= newdist: continue
+            if newpos in distances and distances[newpos] <= newdist: continue
 
             q.put((newdist, newpos))
 
     return distances
 
-def countreachable(grid: list[str], n: int, startpos: Optional[tuple[int,int]]=None) -> int:
-    result = traversegrid(grid, startpos, n)
-
-    #Flatten list
-    result = [d for row in result for d in row]
+def countreachable(grid: list[str], n: int, startpos: Optional[tuple[int,int]]=None, tiling=False) -> int:
+    result = traversegrid(grid, startpos, n, tiling)
 
     #All squares that can be reached in <=n steps, and is same modulo 2, are reachable.
-    valids = [d for d in result if d is not None and d<=n and d%2==n%2]
+    valids = [d for d in result.values() if d is not None and d<=n and d%2==n%2]
 
     return len(valids)
 
-def part2(grid: list[str], steps):
-
-    #Figure out how many reachable squares there are in a tile
-    return ""
+def polyval(x: int,z: np.ndarray):
+    return z[0] * x**2 + z[1]*x + z[2]
 
 
 if __name__ == "__main__":
     grid = readinput()
 
     if len(grid) < 20:
-        steps = 6
-        p2_steps = [6, 10, 50, 100, 500, 1000, 5000]
+        p1_steps = 6
+        total_steps = 5000
     else:
-        steps = 64
-        p2_steps = [26501365]
+        p1_steps = 64
+        total_steps = 26501365
 
-    if len(sys.argv) >= 2:
-        p2_steps = [int(sys.argv[1])]
-
-    p1 = countreachable(grid, steps)
-    print(f"Part 1 ({steps} steps):", p1)
+    p1 = countreachable(grid, p1_steps)
+    print(f"Part 1 ({p1_steps} steps):", p1)
+    print()
 
 
-    for steps in p2_steps:
-        p2 = part2(grid, steps)
-        print(f"Part 2 ({steps} steps):", p2)
+    tile_size = len(grid)
+    assert tile_size%2==1 #We only comprehend odd grid sizes today
+
+    steps_to_edge = tile_size//2
+
+    #Do two tiles per cycle, since they're alternating "odd/even" (uneven-length checkerboard pattern)
+    cycle_length = tile_size*2
+
+    final_steps = (total_steps-steps_to_edge)%cycle_length
+
+    cycles = (total_steps-steps_to_edge) // cycle_length
+
+    print("Initial steps:", steps_to_edge)
+    print(f"Cycles @ {cycle_length} steps: {cycles}")
+    print("Final steps:", final_steps)
+    assert steps_to_edge + cycles*cycle_length + final_steps == total_steps
+
+    p2_steps = []
+    x = []
+    y = []
+    nsteps = []
+    for count in [2, 3, 4]:
+        steps = steps_to_edge + count*cycle_length + final_steps
+        result = countreachable(grid, steps, None, True)
+        print(steps,result)
+        x.append(steps)
+        y.append(result)
+
+    #Difference between the steps
+    d1 = [y[1]-y[0],y[2]-y[1]]
+
+    #Increase in difference each step. This is a constant number.
+    diff = d1[1]-d1[0]
+
+    print("2nd order difference: ", diff)
+
+    #Just count our way up, less math. Start at the "4 cycles" point
+    tiles = y[2]
+    steps = x[2]
+    delta = d1[1]
+    cycles = 4
+
+    while True:
+        delta += diff
+        tiles += delta
+        steps += cycle_length
+        cycles += 1
+        if steps >= total_steps:
+            break
+
+    print("Cycles:", cycles)
+    print("Steps:", steps)
+    print("Tiles:", tiles, " <-------")
+
+
+    z = np.polyfit(x, y, 2)
+    poly = np.poly1d(z)
+
+    for steps, tiles in zip(x,y):
+        print(steps, poly(steps), tiles)
+
+    print("Polynomial thing:", poly(total_steps))
+
+
+
