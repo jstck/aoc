@@ -1,28 +1,12 @@
 #!/usr/bin/env python3
-from __future__ import annotations
-
-from functools import cache
-from itertools import combinations, permutations
-import collections
-from queue import PriorityQueue, SimpleQueue
-from collections import defaultdict, deque, Counter, OrderedDict
-import heapq
-from dataclasses import dataclass
-import math
-import re
-import sys
-from typing import TypeAlias, Optional, Iterable, Mapping
-
-import math
-import re
+from queue import SimpleQueue
 import sys
 import networkx as nx
-import copy
-
 
 sys.path.append("../..")
 from lib.aoc import *
 
+#Do the very easy thing and find what to cut using networkx.minimum_edge_cut()
 def findcuts(graph: dict[str,set[str]]) -> set[tuple[str,str]]:
     G = nx.Graph()
 
@@ -39,8 +23,8 @@ def findcuts(graph: dict[str,set[str]]) -> set[tuple[str,str]]:
 
     return cuts
 
-
-def cutgraph(graph: dict[str,set[str]], cuts: Iterable[tuple[str,str]]) -> int:
+#Cut out some nodes in a graph and find subgraphs
+def cutgraph(graph: dict[str,set[str]], cuts: set[tuple[str,str]]) -> int:
 
     #Make graph be bidirectional so we find everything easier
     reverse = {}
