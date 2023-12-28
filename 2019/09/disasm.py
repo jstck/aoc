@@ -25,6 +25,9 @@ def parse_op(opcode):
         mode3 = (opcode // 10000) % 10
         return (op, mode1, mode2, mode3)
 
+def disasm_instr(program: list[int], pc: int):
+    pass    
+
 def disasm(program: list[int]):
     pc = 0
      
