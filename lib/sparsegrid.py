@@ -23,6 +23,12 @@ class SparseGrid(Generic[T]):
     def __iter__(self) -> Iterator[tuple[tuple[int,int],T]]:
         return iter(self.data.items())
     
+    def __len__(self) -> int:
+        return len(self.data)
+    
+    def __contains__(self, pos: tuple[int,int]) -> bool:
+        return pos in self.data
+
     def keys(self) -> Iterator[tuple[int,int]]:
         return iter(self.data.keys())
     
@@ -66,20 +72,34 @@ class SparseGrid(Generic[T]):
     
     def offset(self, dx: int, dy: int) -> SparseGrid[T]:
         return self.map( lambda x,y: (x+dx, y+dy))
-    
-    def neighbours(self, pos: tuple[int,int]) -> Iterator[tuple[tuple[int,int],T]]:
-        for dx, dy in ((-1,0), (1,0), (0,-1), (0,1)):
-            pos2 = pos[0]+dx,pos[1]+dy
-            if pos2 in self.data: yield (pos2,self.data[pos2])
 
-    def neighboursDiag(self, pos: tuple[int,int]) -> Iterator[tuple[tuple[int,int],T]]:
+    #Return all possible moves from a certain position    
+    @classmethod
+    def neighbourPos(cls, pos: tuple[int,int]) -> Iterator[tuple[int,int]]:
+        for dx, dy in ((-1,0), (1,0), (0,-1), (0,1)):
+            yield (pos[0]+dx,pos[1]+dy)
+
+    @classmethod
+    def neighboursDiagPos(cls, pos: tuple[int,int]) -> Iterator[tuple[int,int]]:
         for dx in (-1,0,1):
             for dy in (-1,0,1):
                 if dx==0 and dy==0: continue
-                pos2 = pos[0]+dx,pos[1]+dy
-                if pos2 in self.data: yield (pos2,self.data[pos2])
+                yield (pos[0]+dx,pos[1]+dy)
+
+    @classmethod
+    def neighboursHexPos(cls, pos: tuple[int,int]) -> Iterator[tuple[int,int]]:
+        for dx,dy in ( (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1, 0)):    
+            yield (pos[0]+dx,pos[1]+dy)
+    
+    #Return all neighbours from a certain position that exist in grid
+    def neighbours(self, pos: tuple[int,int]) -> Iterator[tuple[tuple[int,int],T]]:
+        for pos2 in self.neighbourPos(pos):
+            if pos2 in self.data: yield (pos2,self.data[pos2])
+
+    def neighboursDiag(self, pos: tuple[int,int]) -> Iterator[tuple[tuple[int,int],T]]:
+        for pos2 in self.neighboursDiagPos(pos):
+            if pos2 in self.data: yield (pos2,self.data[pos2])
 
     def neighboursHex(self, pos: tuple[int,int]) -> Iterator[tuple[tuple[int,int],T]]:
-        for dx,dy in ( (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1, 0)):    
-            pos2 = pos[0]+dx,pos[1]+dy
+        for pos2 in self.neighboursHexPos(pos):
             if pos2 in self.data: yield (pos2,self.data[pos2])

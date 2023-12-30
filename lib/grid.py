@@ -40,6 +40,10 @@ class Grid(Generic[T]):
         assert 0<=x<self.size_x and 0<=y<self.size_y, f"Out of bounds: ({x}, {y})"
         self.data[y][x] = val
     
+    #Verify that a coordinate is in bounds
+    def inbounds(self, x: int, y: int) -> bool:
+        return 0<=x<self.size_x and 0<=y<self.size_y
+
     #Get a row or column, regular or reversed
     def row(self, y: int) -> Iterator[T]:
         return iter(self.data[y])
@@ -165,12 +169,12 @@ class Grid(Generic[T]):
                 
                 yield (x1,y1,self[x1,y1])
 
-    #Create a sparse grid with a filter on value
-#    def sparseGrid(self, filter=None) -> SparseGrid[T]:
-#        if filter is None:
-#            filter = lambda x: True
-#
-#        return SparseGrid( ((x,y),val) for (x,y,val) in self.enumerate() if filter(val) )
+    #Get all positions of a certain value
+    def findvalue(self, value: T) -> Iterator[tuple[int,int]]:
+        for x,y,val in self.enumerate():
+            if val==value: yield (x,y)
+
+
         
 
 
