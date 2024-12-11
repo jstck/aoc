@@ -3,10 +3,9 @@
 from functools import cache
 from typing import Iterable, Iterator
 
-import math
-import re
 import sys
 
+import time
 
 sys.path.append("../..")
 from lib.aoc import *
@@ -58,15 +57,34 @@ def blinkc(stone: int, n: int) -> int:
 def stonify(stones: Iterable[int], ngen) -> int:
     return sum([blinkc(stone, ngen) for stone in stones])
 
+
 if __name__ == "__main__":
     input = readinput()
     stones = list(map(int, input[0].split()))
 
+
+    t0 = time.time()
     p1 = part1(stones)
+    t1 = time.time()
     print("Part 1: ", p1)
 
+    print("T:", t1-t0)
+    print()
+    
+    t0 = time.time()
     p1b = stonify(stones, 25)
+    t1 = time.time()
     print("Part 1b:", p1b)
+    print("T:", t1-t0)
+    print(blinkc.cache_info())
+    blinkone.cache_clear()
+    blinkc.cache_clear()
+    print()
 
+    t0 = time.time()
     p2 = stonify(stones, 75)
+    t1 = time.time()
     print("Part 2: ", p2)
+    print("T:", t1-t0)
+    print(blinkc.cache_info())
+    print()
