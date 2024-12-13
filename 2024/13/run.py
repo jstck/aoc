@@ -92,22 +92,29 @@ def cfs(problem: Problem) -> int:
     return -1
 
 #Solve linear equation system, check for integer solution. If there is one, it's all good.
-def justDoMath(problem: Problem)-> int:
-    x1,y1,x2,y2,x3,y3 = problem.parts()
+def justDoMath(ax,ay,bx,by,px,py)-> int:
 
-    try:
-        if (x3*y2-x2*y3)%(x1*y2-x2*y1) != 0:
-            return -1
-        if (x3*y1-x1*y3)%(x2*y1-x1*y2) != 0:
-            return -1
-    except ZeroDivisionError:
-        return -1 #Some edge case, will not have a solution (no input has x/y=0)
+    #Nominator and denominator parts of A and B
+    an = px*by-bx*py
+    ad = ax*by-bx*ay
+    bn = px*ay-ax*py
+    bd = bx*ay-ax*by
 
-    a = (x3*y2-x2*y3)//(x1*y2-x2*y1)
-    b = (x3*y1-x1*y3)//(x2*y1-x1*y2)
+    #Some edge case without a solution that would lead to division by zero
+    if ad == 0 or bd == 0:
+        return -1
 
-    assert a>0
-    assert b>0
+    #No integer solutions
+    if an%ad != 0 or bn%bd != 0:
+        return -1
+
+    # Actual solution
+    a = an//ad
+    b = bn//bd
+
+    #Some solution with negative number of button presses. Haven't seen one, but don't want it.
+    if a<0 or b<0:
+        return 0
 
     return a*3+b
 
@@ -117,7 +124,7 @@ if __name__ == "__main__":
     p1 = 0
     p2 = 0
 
-    part_2_badness = 10000000000000
+    p2badness = 10000000000000
 
     for chunk in chunks(readinput()):
         (ax,ay) = re.findall(r"Button A: X\+(\d+), Y\+(\d+)", chunk[0])[0]
@@ -126,19 +133,14 @@ if __name__ == "__main__":
 
         (ax,ay,bx,by,px,py) = map(int, (ax,ay,bx,by,px,py))
 
-        problem1 = Problem(ax,ay,bx,by,px,py)
-        problem2 = Problem(ax,ay,bx,by,px+part_2_badness,py+part_2_badness)
-
-        ag = ax/ay
-        bg = bx/by
-        pg = px/py
-
-        #print(problem1)
+        #problem1 = Problem(ax,ay,bx,by,px,py)
+        #problem2 = Problem(ax,ay,bx,by,px+p2badness,py+p2badness)
 
         #cost = bfs(problem1)
         #cost = cfs(problem1)
-        cost = justDoMath(problem1)
-        cost2 = justDoMath(problem2)
+
+        cost = justDoMath(ax,ay,bx,by,px,py)
+        cost2 = justDoMath(ax,ay,bx,by,px+p2badness,py+p2badness)
 
         if cost >= 0:
             p1 += cost
