@@ -10,6 +10,9 @@ def readinput(fp=sys.stdin) -> list[str]:
 
     return input
 
+def intalize(input: list[str]):
+    for row in input:
+        yield map(int, list(row))
 
 def chunks(input: list[str]) -> list[list[str]]:
     chunk = []
