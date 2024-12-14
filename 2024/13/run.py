@@ -114,7 +114,7 @@ def justDoMath(ax,ay,bx,by,px,py)-> int:
 
     #Some solution with negative number of button presses. Haven't seen one, but don't want it.
     if a<0 or b<0:
-        return 0
+        return -1
 
     return a*3+b
 
