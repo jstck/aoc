@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TypeVar, Generic, Iterable
+from typing import TypeVar, Generic, Iterable, overload
 from collections.abc import Iterator
 import itertools
 #from "./sparsegrid" import SparseGrid
@@ -39,9 +39,28 @@ class Grid(Generic[T]):
         x,y=pos
         assert 0<=x<self.size_x and 0<=y<self.size_y, f"Out of bounds: ({x}, {y})"
         self.data[y][x] = val
+
+    #Sort out wether argument list is a tuple of (x,y), or separate x, y
+    def _figureOutArguments(self, *args) -> tuple[int,int]:
+        if len(args) == 1:
+            return args[0]
+        elif len(args) == 2:
+            return (args[0], args[1])
+        else:
+            raise ValueError("Invalid coordinate arguments:", args)
+
     
     #Verify that a coordinate is in bounds
+    @overload
     def inbounds(self, x: int, y: int) -> bool:
+        ...
+
+    @overload
+    def inbounds(self, x: int, y: int) -> bool:
+        ...
+
+    def inbounds(self, *args) -> bool:
+        (x,y) = self._figureOutArguments(*args)
         return 0<=x<self.size_x and 0<=y<self.size_y
 
     #Get a row or column, regular or reversed
@@ -77,6 +96,11 @@ class Grid(Generic[T]):
             for x in range(self.size_x):
                 yield x,y,self[x,y]
 
+    #Actual iterator (tuple and contents)
+    def __iter__(self) -> Iterator[tuple[tuple[int,int],T]]:
+        for y in range(self.size_y):
+            for x in range(self.size_x):
+                yield (x,y),self[x,y]
 
     def header(self) -> str:
         if self.size_x == 0 or self.size_y == 0:
@@ -151,14 +175,32 @@ class Grid(Generic[T]):
         assert self.size_x == other.size_x
         return Grid(self.data + other.data)
     
+    @overload
     def neighbours(self, x: int, y: int) -> Iterator[tuple[int,int,T]]:
+        ...
+    def neighbours(self, pos: tuple[int,int]) -> Iterator[tuple[int,int,T]]:
+        ...
+    
+
+    def neighbours(self, *args) -> Iterator[tuple[int,int,T]]:
+        (x,y) = self._figureOutArguments(*args)
         for dx, dy in ((-1,0), (1,0), (0,-1), (0,1)):
             x1,y1 = x+dx,y+dy
             if x1<0 or x1>=self.size_x or y1<0 or y1>=self.size_y:
                 continue
             yield (x1,y1,self[x1,y1])
 
+    @overload
     def neighboursDiag(self, x: int, y: int) -> Iterator[tuple[int,int,T]]:
+        ...
+
+    @overload
+    def neighboursDiag(self, p: tuple[int,int]) -> Iterator[tuple[int,int,T]]:
+        ...
+    
+    def neighboursDiag(self, *args) -> Iterator[tuple[int,int,T]]:
+        (x,y) = self._figureOutArguments(*args)
+        
         for dx in (-1,0,1):
             x1 = x+dx
             if x1<0 or x1>=self.size_x: continue
@@ -168,6 +210,7 @@ class Grid(Generic[T]):
                 if y1<0 or y1>=self.size_y: continue
                 
                 yield (x1,y1,self[x1,y1])
+    
 
     #Get all positions of a certain value
     def findvalue(self, value: T) -> Iterator[tuple[int,int]]:
