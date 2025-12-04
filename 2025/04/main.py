@@ -16,9 +16,9 @@ if __name__ == "__main__":
 
         accessible = set()
 
-        for (x,y),c in g:
-            p = (x,y)
-            if c != "@":
+        for p in g:
+            c = g[p]
+            if c not in ["@", "x"]:
                 continue #Not a roll of paper
 
             n = 0

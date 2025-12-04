@@ -41,7 +41,8 @@ class Grid(Generic[T]):
         self.data[y][x] = val
 
     #Sort out wether argument list is a tuple of (x,y), or separate x, y
-    def _figureOutArguments(self, *args) -> tuple[int,int]:
+    @staticmethod
+    def _figureOutArguments(*args) -> tuple[int,int]:
         if len(args) == 1:
             return args[0]
         elif len(args) == 2:
@@ -85,22 +86,16 @@ class Grid(Generic[T]):
         for y, row in enumerate(self.data):
             yield (y,row[x])
 
-    #Go through entire grid
-    def iter(self) -> Iterator[T]:
-        for y in range(self.size_y):
-            for x in range(self.size_x):
-                yield self[x,y]
-
+    #Enumerate/iterate entire grid
     def enumerate(self) -> Iterator[tuple[int,int,T]]:
         for y in range(self.size_y):
             for x in range(self.size_x):
                 yield x,y,self[x,y]
 
-    #Actual iterator (tuple and contents)
-    def __iter__(self) -> Iterator[tuple[tuple[int,int],T]]:
+    def __iter__(self) -> Iterator[tuple[int,int]]:
         for y in range(self.size_y):
             for x in range(self.size_x):
-                yield (x,y),self[x,y]
+                yield (x,y)
 
     def header(self) -> str:
         if self.size_x == 0 or self.size_y == 0:
