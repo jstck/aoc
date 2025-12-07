@@ -17,7 +17,7 @@ fi
 
 mkdir ${DAY0}
 
-cp template.py ${DAY0}/run.py
+cp template.py ${DAY0}/main.py
 
 COOKIE=$(cat cookies.txt)
 URL="https://adventofcode.com/2025/day/${DAY}/input"
