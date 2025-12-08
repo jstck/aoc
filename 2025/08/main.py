@@ -45,13 +45,13 @@ if __name__ == "__main__":
         maxconnections = 1000
 
     #Generate all pairs of distances
-
     distances: list[tuple[int,int,int]] = []
     for a in range(id-1):
         for b in range(a+1, size):
             d = junctions[a].distanceTo(junctions[b])
             distances.append((d,a,b))
 
+    #Sort on shortest distance first (first item in tuple)
     distances.sort()
 
     #Each junction is in a group with just itself
@@ -62,20 +62,11 @@ if __name__ == "__main__":
     b=0
     while True:
         d,a,b = distances[i]
+
+        # Just join the two groups together and set all members to the same thing
         newgroup: set[int] = groups[a].union(groups[b])
         for id in newgroup:
             groups[id] = newgroup
-
-        # The new group contains all junctions, we're done.
-        if len(newgroup) == size:
-            print("Last two boxes connected:")
-            print(junctions[a])
-            print(junctions[b])
-            print()
-            p2 = junctions[a].x * junctions[b].x
-            print("Part 2:", p2)
-
-            break
 
         i+=1
 
@@ -98,3 +89,18 @@ if __name__ == "__main__":
             p1 = s1*s2*s3
             print(f"Part 1: {p1} ({s1}*{s2}*{s3})")
             print()
+
+        # The new group contains all junctions, we're done.
+        if len(newgroup) == size:
+            print(f"Last two boxes connected (after {i} connections):")
+            print(junctions[a])
+            print(junctions[b])
+            print()
+            p2 = junctions[a].x * junctions[b].x
+            print("Part 2:", p2)
+            break
+
+        #Safety bailout
+        if i>=20000:
+            print("Connection limit reached, bailing out")
+            break
