@@ -24,25 +24,21 @@ def part2() -> int:
     
     searchy1 = [("svr", "fft"),("fft","dac"),("dac","out")]
     searchy2 = [("svr", "dac"),("dac","fft"),("fft","out")]
-    c = 1
-    for start,end in searchy1:
-        x = dfs_paths(start,end)
-        #print(f"{start}-{end}: {x}")
-        if x==0:
-            c = 0
-            break
-        c *= x
-    
-    d = 1
-    for start,end in searchy2:
-        x = dfs_paths(start,end)
-        #print(f"{start}-{end}: {x}")
-        if x==0:
-            d = 0
-            break
-        d *= x
-    
-    return c+d
+
+    paths = [ ["svr", "fft", "dac", "out"], ["svr", "dac", "fft", "out"]]
+    sum = 0
+
+    # Multiply the number of subpaths together, and sum them.
+    # One of the paths dac->fft and fft->dac will be zero. If not, there would be a loop
+    # and answer would be infinity.
+    for path in paths:
+        x = 1
+        for start,end in zip(path, path[1:]):
+            c = dfs_paths(start,end)
+            x *= c
+            # if x==0: break
+        sum += x
+    return sum
 
 if __name__ == "__main__":
     input = readinput()
@@ -52,6 +48,9 @@ if __name__ == "__main__":
         a = a.strip()
         b = b.split()
         graph[a] = b
+
+    # Add empty out node for safety (so paths searched in part 2 can end there)
+    graph["out"] = []
 
     #print(graph)
 
