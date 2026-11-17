@@ -29,12 +29,53 @@ def manhattan(grid: Grid[str], a: str, b: str) -> int:
 
 def part1(input: list[str]):
 
-    keypad = Grid(["123", "456", "789", " 0A"])
+    numpad = Grid(["123", "456", "789", " 0A"])
+    dirpad = Grid(["X^A" "<v>"])
 
-    cur = "A"
+    state = ("A", "A")
+
+    #Keypress sequences to get from anywhere to anywhere on directional keypad
+    dirgraph = {
+        "A": {
+            "^": "<",
+            "<": "v<<",
+            "v": "v<",
+            ">": "v"
+        },
+        "^": {
+            "A": ">",
+            "<": "v<",
+            "v": "v",
+            ">": "v>"
+        },
+        "<": {
+            "^": ">^",
+            "A": ">>^",
+            "v": ">",
+            ">": ">>"
+        },
+        "v": {
+            "^": "^",
+            "A": ">^",
+            "<": "<",
+            ">": ">"
+        },
+        ">": {
+            "^": "<^",
+            "A": "^",
+            "<": "<<",
+            "v": "<"
+        },
+    }
+
+    numgraph = {
+        "0"
+    }
 
     for line in input:
         seq = list(line.strip())
+
+    print(numpad)
     return ""
 
 def part2(input: list[str]):

@@ -134,10 +134,6 @@ def canmove(grid: Grid[str], direction: str, pos: tuple[int,int]) -> bool:
         return movecache[pos]
 
 
-    if pos == (14,2):
-        print(grid)
-        return False
-
     #Horizontal move, much simple.
     if direction in ["<", ">"]:
         #Check what's in that direction
