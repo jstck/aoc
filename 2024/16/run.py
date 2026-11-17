@@ -22,6 +22,8 @@ from lib.grid import Grid
 Pos: TypeAlias = tuple[int,int]
 State: TypeAlias = tuple[Pos, int]
 
+ScoreState: TypeAlias = tuple[int, State]
+
 #Plain BFS
 def part1(grid: Grid[str]) -> int:
 
@@ -78,7 +80,8 @@ def part1(grid: Grid[str]) -> int:
 
     return -1
 
-def part2b(grid: Grid[str]) -> int:
+
+def part2(grid: Grid[str]) -> int:
 
     startpos = list(grid.findvalue("S"))
     assert(len(startpos)==1)
@@ -87,45 +90,45 @@ def part2b(grid: Grid[str]) -> int:
     assert(len(endpos)==1)
     endpos = endpos[0]
 
-    q: PriorityQueue[tuple[int, State, frozenset[State]]] = PriorityQueue()
+    # Predecessor states for any state, to backtrack and count.
+    predecessors: dict[State, set[State]] = {}
 
-    visited: dict[State, tuple[int, set[State]]] = {}  #All states that led to this one, to backtrack (marked with best score to reach state)
+    q = PriorityQueue()
+    visited: set[State] = set()  #Score, (x, y), direction
 
+    bestscores: dict[State, int] = {}  #Best score to reach this state
     #0 = right 1 = up 2 = left 3 = down, ok?
 
-    #Queue has score, state, previous states to get here
-    q.put_nowait((0,(startpos,0),frozenset()))
+    bestfinish = 1E9
 
-    bestscore = 1E9 #Upper bound to start with
+    q.put_nowait((0,startpos,0,None))
 
     while not q.empty():
-        score, state, prev = q.get_nowait()
+        score, pos, direction, prev = q.get_nowait()
 
-        if state in visited:
-            bestscorehere = visited[state][0]
-            #Paths here with better score will not happen, because BFS. Can only equal
-            if score == bestscorehere:
+        state: State = (pos, direction)
+
+        if (pos, direction) in visited:
+            if score == bestscores[(pos, direction)]:
                 #Update with possible states to get here equally quickly
-                visited[state][1].update(prev)
-            continue #No need to go further
+                predecessors[state].add(prev)
+            
+            continue
 
-        visited[state] = (score, set(prev))
-
-        pos, direction = state
+        visited.add((pos, direction))
+        bestscores[(pos, direction)] = score
+        predecessors[state] = set([prev]) if prev is not None else set()
 
         here = grid[pos]
         if here == "#":
             continue
 
-        #Don't go further if we're worse than best path (everything "good enough" is already processed)
-        if score > bestscore:
-            break
-
         if here == "E":
-            if score <= bestscore:
-                bestscore = score
-                continue
-        
+            bestfinish = min(bestfinish, score)
+            #print("Found end with score", score, "at", pos, "from", prev)
+            continue
+
+
         #Go straight
         if direction == 0:
             m = (1,0)
@@ -138,48 +141,47 @@ def part2b(grid: Grid[str]) -> int:
         else:
             assert(False)
 
-        newpos: Pos = (pos[0]+m[0], pos[1]+m[1])
-        newstate: State = (newpos, direction)
-        q.put_nowait((score+1, newstate, prev.union(set([state])) ))
+        newpos = tuple(map(sum, zip(pos, m)))
+        q.put_nowait((score+1, newpos, direction, state))
 
         #Turn counterclockwise
         newdir = (direction+1)%4
-        newstate: State = (pos, newdir)
-        q.put_nowait((score+1000, newstate, prev.union(set([state]))))
+        q.put_nowait((score+1000, pos, newdir, state))
 
         #Turn clockwise
         newdir = (direction-1)%4
-        newstate: State = (pos, newdir)
-        q.put_nowait((score+1000, newstate, prev.union(set([state]))))
+        q.put_nowait((score+1000, pos, newdir, state))
 
-    print("Best score:", bestscore)
-    allvisited = set([endpos])
-    for dir in [0,1,2,3]:
+    #Backtrack to count all unique states that led to the end position
+
+    @cache
+    def allPredTiles(state: State) -> set[Pos]:
+
+        pos: Pos = state[0]
+
+        if pos == startpos:
+            return set([pos])
+
+        #No predecessors means this somewhere we never got (finish with unused
+        #incoming direction)
+        if state not in predecessors:
+            return set()
+
+        allvisited: set[Pos] = set([pos])
+
+        for pred in predecessors[state]:
+            allvisited.update(allPredTiles(pred))
+
+        return allvisited
+
+    alltiles: set[Pos] = set()
+
+    for dir in range(4):
         state: State = (endpos, dir)
-    print("# things visited:", len())
+        if bestscores.get(state, 1E9) == bestfinish:
+            alltiles.update(allPredTiles(state))
 
-    return -1
-
-
-#Dijkstra your eyes out
-def part2d(grid: Grid[str]):
-
-    startpos = list(grid.findvalue("S"))
-    assert(len(startpos)==1)
-    startpos = startpos[0]
-    endpos = list(grid.findvalue("E"))
-    assert(len(endpos)==1)
-    endpos = endpos[0]
-
-    #Unvisited is every "empty cell" (not a wall), for every direction
-    unvisited: set[tuple[Pos,int]] = set()
-
-    for pos in itertools.chain(grid.findvalue("."), [startpos, endpos]):
-        #Upper bound cost is manhattan distance * 1001 (one move and one turn each step)
-        #This won't work if a path takes a long detour and gets back to somewhere close to the start though.
-        pass
-
-
+    return len(alltiles)
 
 if __name__ == "__main__":
     input = readinput()
